@@ -1,0 +1,63 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  max-width: 760px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.heading {
+  margin: 0;
+  font-family: var(--font-head);
+  font-size: 13px;
+  color: var(--yellow);
+}
+
+.count {
+  font-family: var(--font-term);
+  font-size: 22px;
+  color: var(--grey);
+}
+
+.dots {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.dot,
+.dotOn {
+  width: 14px;
+  height: 14px;
+  border: var(--border-thin);
+  background: var(--bg);
+}
+
+.dotOn {
+  background: var(--yellow);
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.pipRow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+}

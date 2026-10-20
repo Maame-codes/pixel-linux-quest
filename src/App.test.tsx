@@ -25,9 +25,15 @@ describe('App routing', () => {
     expect(screen.getByRole('heading', { name: 'WORLD MAP' })).toBeInTheDocument()
   })
 
-  it('resolves a deep-linked level and shows its id', () => {
+  it('resolves a deep-linked level and opens its lesson', () => {
     renderAt('/level/w2-l4-dig-a-folder')
-    expect(screen.getByText('w2-l4-dig-a-folder')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'THE LESSON' })).toBeInTheDocument()
+    expect(screen.getByText(/LEVEL 4: DIG A FOLDER/)).toBeInTheDocument()
+  })
+
+  it('shows a not-found message for an unknown level', () => {
+    renderAt('/level/does-not-exist')
+    expect(screen.getByRole('heading', { name: 'LEVEL NOT FOUND' })).toBeInTheDocument()
   })
 
   it('redirects unknown routes back to the title screen', () => {

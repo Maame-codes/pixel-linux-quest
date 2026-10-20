@@ -1,0 +1,134 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.columns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+  align-items: flex-start;
+}
+
+.side {
+  flex: 1 1 340px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.main {
+  flex: 999 1 560px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.cardTitle {
+  margin: 0;
+  font-family: var(--font-head);
+  font-size: 13px;
+  color: var(--yellow);
+}
+
+.xpChip {
+  font-family: var(--font-head);
+  font-size: 9px;
+  color: var(--bg);
+  background: var(--yellow);
+  padding: 6px 8px;
+  border: var(--border-thin);
+}
+
+.cmdList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cmdRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.cmdCode {
+  flex-shrink: 0;
+  font-family: var(--font-term);
+  font-size: 22px;
+  color: var(--lime);
+  background: var(--deep);
+  padding: 2px 8px;
+  min-width: 120px;
+}
+
+.cmdText {
+  font-size: 18px;
+  color: var(--soft-text);
+}
+
+.pipRow {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-4);
+}
+
+.hint {
+  flex: 1 1 auto;
+  min-width: 0;
+  background: var(--white);
+  color: var(--bg);
+  border: var(--border);
+  padding: 14px 16px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.hintText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.hintLabel {
+  font-family: var(--font-head);
+  font-size: 9px;
+  color: var(--panel-2);
+}
+
+.hintBody {
+  font-family: var(--font-term);
+  font-size: 24px;
+  line-height: 1.1;
+}
+
+.answer {
+  align-self: flex-start;
+  font-family: var(--font-term);
+  font-size: 24px;
+  color: var(--lime);
+  background: var(--deep);
+  padding: 2px 10px;
+}
