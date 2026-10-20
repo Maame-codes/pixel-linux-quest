@@ -1,0 +1,5 @@
+.pip {
+  display: block;
+  flex-shrink: 0;
+  shape-rendering: crispEdges;
+}

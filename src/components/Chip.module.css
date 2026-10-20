@@ -1,0 +1,29 @@
+.chip {
+  display: inline-block;
+  font-family: var(--font-head);
+  font-size: 8px;
+  line-height: 1.4;
+  padding: 6px 8px;
+  border: var(--border-thin);
+}
+
+.done {
+  background: var(--green);
+  color: var(--deep);
+}
+
+.current {
+  background: var(--yellow);
+  color: var(--bg);
+}
+
+.locked {
+  background: var(--bg);
+  color: var(--soft-text);
+}
+
+.xp {
+  background: var(--yellow);
+  color: var(--bg);
+  font-size: 9px;
+}

@@ -1,0 +1,13 @@
+.base {
+  border: var(--border);
+  box-shadow: var(--shadow);
+  padding: var(--space-5);
+}
+
+.panel {
+  background: var(--panel);
+}
+
+.panel2 {
+  background: var(--panel-2);
+}

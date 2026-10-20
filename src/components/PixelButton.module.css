@@ -1,0 +1,35 @@
+.btn {
+  display: inline-block;
+  font-family: var(--font-head);
+  font-size: 12px;
+  line-height: 1.4;
+  text-align: center;
+  text-decoration: none;
+  padding: 18px 22px;
+  border: var(--border);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: transform 0.06s ease, box-shadow 0.06s ease;
+}
+
+.btn:active {
+  transform: translate(3px, 3px);
+  box-shadow: 3px 3px 0 var(--deep);
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  color: var(--soft-text);
+  background: var(--bg);
+  box-shadow: none;
+}
+
+.primary {
+  color: var(--bg);
+  background: var(--yellow);
+}
+
+.secondary {
+  color: var(--white);
+  background: var(--panel);
+}

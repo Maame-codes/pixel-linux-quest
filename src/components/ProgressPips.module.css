@@ -1,0 +1,23 @@
+.pips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.pip {
+  width: 18px;
+  height: 18px;
+  border: var(--border-thin);
+}
+
+.empty {
+  background: var(--bg);
+}
+
+.cleared {
+  background: var(--lime);
+}
+
+.current {
+  background: var(--yellow);
+}

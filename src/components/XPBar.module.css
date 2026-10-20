@@ -1,0 +1,29 @@
+.wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.level {
+  font-family: var(--font-head);
+  font-size: 10px;
+  color: var(--cyan);
+}
+
+.track {
+  width: 140px;
+  height: 16px;
+  background: var(--bg);
+  border: var(--border-thin);
+}
+
+.fill {
+  height: 100%;
+  background: var(--lime);
+}
+
+.text {
+  font-family: var(--font-term);
+  font-size: 22px;
+  color: var(--white);
+}

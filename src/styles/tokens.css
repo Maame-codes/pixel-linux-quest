@@ -1,0 +1,42 @@
+:root {
+  /* Sweetie 16 palette */
+  --bg: #1a1c2c;
+  --deep: #0f1020;
+  --panel: #333c57;
+  --panel-2: #29366f;
+  --blue: #3b5dc9;
+  --sky: #41a6f6;
+  --cyan: #73eff7;
+  --white: #f4f4f4;
+  --soft-text: #c5d2db;
+  --grey: #94b0c2;
+  --slate: #566c86;
+  --yellow: #ffcd75;
+  --orange: #ef7d57;
+  --lime: #a7f070;
+  --green: #38b764;
+
+  /* Font stacks (self-hosted primary, real fallbacks) */
+  --font-head: 'Press Start 2P', 'Courier New', monospace;
+  --font-read: 'Pixelify Sans', 'Trebuchet MS', 'Segoe UI', sans-serif;
+  --font-term: 'VT323', 'Courier New', monospace;
+
+  /* Shapes: no rounded corners, solid dark borders, hard offset shadows */
+  --border-w: 4px;
+  --border: var(--border-w) solid var(--deep);
+  --border-thin: 3px solid var(--deep);
+  --shadow: 6px 6px 0 var(--deep);
+  --shadow-lg: 8px 8px 0 var(--deep);
+
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  /* Layout */
+  --maxw: 1200px;
+}

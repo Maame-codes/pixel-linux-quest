@@ -1,0 +1,71 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--white);
+  font-family: var(--font-read);
+  font-size: 20px;
+  line-height: 1.5;
+}
+
+/* Pixel art stays crisp. Raster sprites: pixelated. SVG sprites: crispEdges. */
+img {
+  image-rendering: pixelated;
+}
+
+svg {
+  shape-rendering: crispEdges;
+}
+
+a {
+  color: var(--yellow);
+}
+
+a:hover {
+  color: var(--white);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-head);
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+p {
+  line-height: 1.5;
+}
+
+/* Design rule: no rounded corners anywhere. */
+* {
+  border-radius: 0;
+}
+
+/* Visible yellow focus outline for keyboard users. */
+:focus-visible {
+  outline: 3px solid var(--yellow);
+  outline-offset: 2px;
+}
+
+/* Respect reduced-motion preference. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

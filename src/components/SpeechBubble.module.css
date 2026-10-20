@@ -1,0 +1,33 @@
+.bubble {
+  position: relative;
+  background: var(--white);
+  color: var(--bg);
+  border: var(--border);
+  padding: var(--space-3) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* Little pixel tail pointing left. */
+.bubble::before {
+  content: '';
+  position: absolute;
+  left: -14px;
+  top: 24px;
+  width: 14px;
+  height: 14px;
+  background: var(--deep);
+}
+
+.label {
+  font-family: var(--font-head);
+  font-size: 9px;
+  color: var(--panel-2);
+}
+
+.body {
+  font-family: var(--font-term);
+  font-size: 24px;
+  line-height: 1.1;
+}
