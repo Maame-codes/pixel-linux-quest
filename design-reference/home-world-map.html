@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Pixel Linux Quest: world map</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&amp;family=Pixelify+Sans:wght@400;600&amp;family=VT323&amp;display=swap">
+<style>
+body{margin:0;background:#1a1c2c}
+a{color:#ffcd75}a:hover{color:#f4f4f4}
+</style>
+</helmet>
+<div style="width: 100%; box-sizing: border-box; background: #1a1c2c; color: #f4f4f4; font-family: 'Pixelify Sans', 'Courier New', monospace; padding-bottom: 48px">
+
+<header style="background: #29366f; border-bottom: 4px solid #0f1020">
+<div style="max-width: 1200px; margin: 0 auto; padding: 14px 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px">
+<div style="display: flex; align-items: center; gap: 12px">
+<svg width="40" height="40" viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true"><rect x="6" y="0" width="4" height="1" fill="#1a1c2c"></rect><rect x="4" y="1" width="8" height="1" fill="#1a1c2c"></rect><rect x="3" y="2" width="10" height="1" fill="#1a1c2c"></rect><rect x="3" y="3" width="2" height="1" fill="#1a1c2c"></rect><rect x="5" y="3" width="2" height="1" fill="#f4f4f4"></rect><rect x="7" y="3" width="2" height="1" fill="#1a1c2c"></rect><rect x="9" y="3" width="2" height="1" fill="#f4f4f4"></rect><rect x="11" y="3" width="2" height="1" fill="#1a1c2c"></rect><rect x="2" y="4" width="3" height="1" fill="#1a1c2c"></rect><rect x="5" y="4" width="1" height="1" fill="#f4f4f4"></rect><rect x="6" y="4" width="3" height="1" fill="#1a1c2c"></rect><rect x="9" y="4" width="1" height="1" fill="#f4f4f4"></rect><rect x="10" y="4" width="4" height="1" fill="#1a1c2c"></rect><rect x="2" y="5" width="3" height="1" fill="#1a1c2c"></rect><rect x="5" y="5" width="2" height="1" fill="#f4f4f4"></rect><rect x="7" y="5" width="2" height="1" fill="#ef7d57"></rect><rect x="9" y="5" width="2" height="1" fill="#f4f4f4"></rect><rect x="11" y="5" width="3" height="1" fill="#1a1c2c"></rect><rect x="2" y="6" width="4" height="1" fill="#1a1c2c"></rect><rect x="6" y="6" width="4" height="1" fill="#ef7d57"></rect><rect x="10" y="6" width="4" height="1" fill="#1a1c2c"></rect><rect x="1" y="7" width="3" height="1" fill="#1a1c2c"></rect><rect x="4" y="7" width="8" height="1" fill="#f4f4f4"></rect><rect x="12" y="7" width="3" height="1" fill="#1a1c2c"></rect><rect x="1" y="8" width="2" height="1" fill="#1a1c2c"></rect><rect x="3" y="8" width="10" height="1" fill="#f4f4f4"></rect><rect x="13" y="8" width="2" height="1" fill="#1a1c2c"></rect><rect x="0" y="9" width="3" height="1" fill="#1a1c2c"></rect><rect x="3" y="9" width="10" height="1" fill="#f4f4f4"></rect><rect x="13" y="9" width="3" height="1" fill="#1a1c2c"></rect><rect x="0" y="10" width="2" height="1" fill="#1a1c2c"></rect><rect x="3" y="10" width="10" height="1" fill="#f4f4f4"></rect><rect x="14" y="10" width="2" height="1" fill="#1a1c2c"></rect><rect x="3" y="11" width="10" height="1" fill="#f4f4f4"></rect><rect x="3" y="12" width="1" height="1" fill="#1a1c2c"></rect><rect x="4" y="12" width="8" height="1" fill="#f4f4f4"></rect><rect x="12" y="12" width="1" height="1" fill="#1a1c2c"></rect><rect x="4" y="13" width="2" height="1" fill="#1a1c2c"></rect><rect x="6" y="13" width="4" height="1" fill="#f4f4f4"></rect><rect x="10" y="13" width="2" height="1" fill="#1a1c2c"></rect><rect x="3" y="14" width="4" height="1" fill="#ef7d57"></rect><rect x="9" y="14" width="4" height="1" fill="#ef7d57"></rect></svg>
+<span style="font-family: 'Press Start 2P', monospace; font-size: 14px; line-height: 1.4; color: #ffcd75">PIXEL LINUX QUEST</span>
+</div>
+<nav aria-label="Main" style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px">
+<a href="#map" style="font-family: 'Press Start 2P', monospace; font-size: 10px; color: #f4f4f4; text-decoration: none; padding: 16px 12px">MAP</a>
+<a href="#sandbox" style="font-family: 'Press Start 2P', monospace; font-size: 10px; color: #f4f4f4; text-decoration: none; padding: 16px 12px">SANDBOX</a>
+<a href="#badges" style="font-family: 'Press Start 2P', monospace; font-size: 10px; color: #f4f4f4; text-decoration: none; padding: 16px 12px">BADGES</a>
+</nav>
+<div style="display: flex; align-items: center; gap: 12px">
+<span style="font-family: 'Press Start 2P', monospace; font-size: 10px; color: #73eff7">LVL 3</span>
+<div style="width: 140px; height: 16px; background: #1a1c2c; border: 3px solid #0f1020">
+<div style="width: 68%; height: 100%; background: #a7f070"></div>
+</div>
+<span style="font-family: 'VT323', monospace; font-size: 22px; color: #f4f4f4">340/500 XP</span>
+</div>
+</div>
+</header>
+
+<section style="max-width: 1200px; margin: 0 auto; padding: 56px 24px 40px; display: flex; flex-wrap: wrap; align-items: center; gap: 48px">
+<div style="flex: 1 1 460px; min-width: 0; display: flex; flex-direction: column; gap: 22px">
+<p style="margin: 0; font-family: 'Press Start 2P', monospace; font-size: 10px; letter-spacing: 1px; color: #73eff7">WORLD 2: COMMAND CAVES</p>
+<h1 style="margin: 0; font-family: 'Press Start 2P', monospace; font-size: 30px; line-height: 1.5; color: #f4f4f4">Learn Linux one level at a time.</h1>
+<p style="margin: 0; font-size: 22px; line-height: 1.5; color: #c5d2db">Type real commands in a pocket terminal, clear quests, earn XP and unlock new worlds. Nothing to install, just you, Pip and the shell.</p>
+<div style="display: flex; flex-wrap: wrap; gap: 18px; padding-top: 6px">
+<a href="Lesson.dc.html" style="display: inline-block; font-family: 'Press Start 2P', monospace; font-size: 12px; line-height: 1.4; color: #1a1c2c; background: #ffcd75; text-decoration: none; padding: 18px 22px; border: 4px solid #0f1020; box-shadow: 6px 6px 0 #0f1020">CONTINUE LEVEL 4</a>
+<a href="#sandbox" style="display: inline-block; font-family: 'Press Start 2P', monospace; font-size: 12px; line-height: 1.4; color: #f4f4f4; background: #333c57; text-decoration: none; padding: 18px 22px; border: 4px solid #0f1020; box-shadow: 6px 6px 0 #0f1020">FREE PLAY SANDBOX</a>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 14px; padding-top: 14px">
+<div style="flex: 1 1 110px; background: #29366f; border: 4px solid #0f1020; padding: 14px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-family: 'Press Start 2P', monospace; font-size: 16px; color: #ffcd75">340</span>
+<span style="font-family: 'VT323', monospace; font-size: 20px; color: #c5d2db">XP earned</span>
+</div>
+<div style="flex: 1 1 110px; background: #29366f; border: 4px solid #0f1020; padding: 14px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-family: 'Press Start 2P', monospace; font-size: 16px; color: #ffcd75">4</span>
+<span style="font-family: 'VT323', monospace; font-size: 20px; color: #c5d2db">day streak</span>
+</div>
+<div style="flex: 1 1 110px; background: #29366f; border: 4px solid #0f1020; padding: 14px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-family: 'Press Start 2P', monospace; font-size: 16px; color: #ffcd75">12</span>
+<span style="font-family: 'VT323', monospace; font-size: 20px; color: #c5d2db">commands learned</span>
+</div>
+<div style="flex: 1 1 110px; background: #29366f; border: 4px solid #0f1020; padding: 14px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-family: 'Press Start 2P', monospace; font-size: 16px; color: #ffcd75">3</span>
+<span style="font-family: 'VT323', monospace; font-size: 20px; color: #c5d2db">badges</span>
+</div>
+</div>
+</div>
+
+<div style="flex: 1 1 420px; min-width: 0; height: 360px; position: relative; overflow: hidden; background: #41a6f6; border: 4px solid #0f1020; box-shadow: 8px 8px 0 #0f1020">
+<div style="position: absolute; top: 28px; left: 28px; width: 40px; height: 40px; background: #ffcd75"></div>
+<div style="position: absolute; top: 40px; left: 110px; width: 96px; height: 16px; background: #f4f4f4"></div>
+<div style="position: absolute; top: 28px; left: 126px; width: 56px; height: 16px; background: #f4f4f4"></div>
+<div style="position: absolute; top: 120px; right: 40px; width: 72px; height: 12px; background: #73eff7"></div>
+<div style="position: absolute; left: 0; right: 0; bottom: 0; height: 80px; background: #94b0c2; border-top: 12px solid #f4f4f4"></div>
+<div style="position: absolute; left: 24px; bottom: 30px; width: 24px; height: 24px; background: #566c86"></div>
+<div style="position: absolute; right: 36px; bottom: 22px; width: 40px; height: 20px; background: #566c86"></div>
+<svg style="position: absolute; left: 56px; bottom: 84px" width="144" height="144" viewBox="0 0 16 16" shape-rendering="crispEdges" role="img" aria-label="Pip the pixel penguin"><rect x="6" y="0" width="4" height="1" fill="#1a1c2c"></rect><rect x="4" y="1" width="8" height="1" fill="#1a1c2c"></rect><rect x="3" y="2" width="10" height="1" fill="#1a1c2c"></rect><rect x="3" y="3" width="2" height="1" fill="#1a1c2c"></rect><rect x="5" y="3" width="2" height="1" fill="#f4f4f4"></rect><rect x="7" y="3" width="2" height="1" fill="#1a1c2c"></rect><rect x="9" y="3" width="2" height="1" fill="#f4f4f4"></rect><rect x="11" y="3" width="2" height="1" fill="#1a1c2c"></rect><rect x="2" y="4" width="3" height="1" fill="#1a1c2c"></rect><rect x="5" y="4" width="1" height="1" fill="#f4f4f4"></rect><rect x="6" y="4" width="3" height="1" fill="#1a1c2c"></rect><rect x="9" y="4" width="1" height="1" fill="#f4f4f4"></rect><rect x="10" y="4" width="4" height="1" fill="#1a1c2c"></rect><rect x="2" y="5" width="3" height="1" fill="#1a1c2c"></rect><rect x="5" y="5" width="2" height="1" fill="#f4f4f4"></rect><rect x="7" y="5" width="2" height="1" fill="#ef7d57"></rect><rect x="9" y="5" width="2" height="1" fill="#f4f4f4"></rect><rect x="11" y="5" width="3" height="1" fill="#1a1c2c"></rect><rect x="2" y="6" width="4" height="1" fill="#1a1c2c"></rect><rect x="6" y="6" width="4" height="1" fill="#ef7d57"></rect><rect x="10" y="6" width="4" height="1" fill="#1a1c2c"></rect><rect x="1" y="7" width="3" height="1" fill="#1a1c2c"></rect><rect x="4" y="7" width="8" height="1" fill="#f4f4f4"></rect><rect x="12" y="7" width="3" height="1" fill="#1a1c2c"></rect><rect x="1" y="8" width="2" height="1" fill="#1a1c2c"></rect><rect x="3" y="8" width="10" height="1" fill="#f4f4f4"></rect><rect x="13" y="8" width="2" height="1" fill="#1a1c2c"></rect><rect x="0" y="9" width="3" height="1" fill="#1a1c2c"></rect><rect x="3" y="9" width="10" height="1" fill="#f4f4f4"></rect><rect x="13" y="9" width="3" height="1" fill="#1a1c2c"></rect><rect x="0" y="10" width="2" height="1" fill="#1a1c2c"></rect><rect x="3" y="10" width="10" height="1" fill="#f4f4f4"></rect><rect x="14" y="10" width="2" height="1" fill="#1a1c2c"></rect><rect x="3" y="11" width="10" height="1" fill="#f4f4f4"></rect><rect x="3" y="12" width="1" height="1" fill="#1a1c2c"></rect><rect x="4" y="12" width="8" height="1" fill="#f4f4f4"></rect><rect x="12" y="12" width="1" height="1" fill="#1a1c2c"></rect><rect x="4" y="13" width="2" height="1" fill="#1a1c2c"></rect><rect x="6" y="13" width="4" height="1" fill="#f4f4f4"></rect><rect x="10" y="13" width="2" height="1" fill="#1a1c2c"></rect><rect x="3" y="14" width="4" height="1" fill="#ef7d57"></rect><rect x="9" y="14" width="4" height="1" fill="#ef7d57"></rect></svg>
+<div style="position: absolute; top: 150px; right: 24px; max-width: 48%; background: #f4f4f4; color: #1a1c2c; border: 4px solid #0f1020; padding: 12px 14px; font-family: 'VT323', monospace; font-size: 24px; line-height: 1.1">Hi, I'm Pip! Ready to dig your first folder?</div>
+<div style="position: absolute; top: 210px; right: 49%; width: 14px; height: 14px; background: #0f1020"></div>
+</div>
+</section>
+
+<section id="map" style="max-width: 1200px; margin: 0 auto; padding: 24px 24px 40px; display: flex; flex-direction: column; gap: 24px">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px">
+<h2 style="margin: 0; font-family: 'Press Start 2P', monospace; font-size: 20px; color: #f4f4f4">WORLD MAP</h2>
+<span style="font-family: 'VT323', monospace; font-size: 22px; color: #94b0c2">6 worlds, 24 levels, 1 final boss</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px">
+<sc-for list="{{worlds}}" as="w" hint-placeholder-count="6">
+<article style="background: #333c57; border: 4px solid {{w.border}}; box-shadow: 6px 6px 0 #0f1020; display: flex; flex-direction: column">
+<div style="height: 14px; background: {{w.band}}"></div>
+<div style="padding: 20px; display: flex; flex-direction: column; gap: 14px; flex-grow: 1">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+<span style="font-family: 'Press Start 2P', monospace; font-size: 10px; color: #c5d2db">WORLD {{w.num}}</span>
+<span style="font-family: 'Press Start 2P', monospace; font-size: 8px; padding: 6px 8px; border: 3px solid #0f1020; background: {{w.chipBg}}; color: {{w.chipFg}}">{{w.chip}}</span>
+</div>
+<h3 style="margin: 0; font-family: 'Press Start 2P', monospace; font-size: 15px; line-height: 1.5; color: #f4f4f4">{{w.name}}</h3>
+<p style="margin: 0; font-size: 19px; line-height: 1.4; color: #c5d2db; flex-grow: 1">{{w.topic}}</p>
+<div style="display: flex; flex-wrap: wrap; gap: 8px" aria-label="{{w.progress}}">
+<sc-for list="{{w.pips}}" as="p" hint-placeholder-count="4">
+<div style="width: 18px; height: 18px; border: 3px solid #0f1020; background: {{p.bg}}"></div>
+</sc-for>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 4px">
+<span style="font-family: 'VT323', monospace; font-size: 22px; color: #f4f4f4">{{w.progress}}</span>
+<sc-if value="{{w.isCurrent}}" hint-placeholder-val="{{false}}">
+<a href="Lesson.dc.html" style="font-family: 'Press Start 2P', monospace; font-size: 10px; color: #1a1c2c; background: #ffcd75; text-decoration: none; padding: 14px 14px; border: 3px solid #0f1020">CONTINUE</a>
+</sc-if>
+<sc-if value="{{w.isDone}}" hint-placeholder-val="{{false}}">
+<a href="Lesson.dc.html" style="font-family: 'Press Start 2P', monospace; font-size: 10px; color: #f4f4f4; background: #29366f; text-decoration: none; padding: 14px 14px; border: 3px solid #0f1020">REPLAY</a>
+</sc-if>
+<sc-if value="{{w.isLocked}}" hint-placeholder-val="{{true}}">
+<button type="button" disabled="disabled" style="font-family: 'Press Start 2P', monospace; font-size: 10px; color: #c5d2db; background: #1a1c2c; padding: 14px 14px; border: 3px solid #0f1020">LOCKED</button>
+</sc-if>
+</div>
+</div>
+</article>
+</sc-for>
+</div>
+</section>
+
+<section style="max-width: 1200px; margin: 0 auto; padding: 16px 24px 40px">
+<div style="background: #29366f; border: 4px solid #0f1020; box-shadow: 6px 6px 0 #0f1020; padding: 28px; display: flex; flex-direction: column; gap: 22px">
+<h2 style="margin: 0; font-family: 'Press Start 2P', monospace; font-size: 16px; color: #f4f4f4">HOW A LEVEL WORKS</h2>
+<div style="display: flex; flex-wrap: wrap; gap: 24px">
+<div style="flex: 1 1 240px; display: flex; gap: 14px; align-items: flex-start">
+<span style="flex-shrink: 0; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: #ffcd75; color: #1a1c2c; border: 3px solid #0f1020; font-family: 'Press Start 2P', monospace; font-size: 14px">1</span>
+<p style="margin: 0; font-size: 20px; line-height: 1.4; color: #f4f4f4">Read a tiny lesson. One idea, a couple of examples, under two minutes.</p>
+</div>
+<div style="flex: 1 1 240px; display: flex; gap: 14px; align-items: flex-start">
+<span style="flex-shrink: 0; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: #73eff7; color: #1a1c2c; border: 3px solid #0f1020; font-family: 'Press Start 2P', monospace; font-size: 14px">2</span>
+<p style="margin: 0; font-size: 20px; line-height: 1.4; color: #f4f4f4">Type commands in the terminal to finish the quest. Pip gives hints if you get stuck.</p>
+</div>
+<div style="flex: 1 1 240px; display: flex; gap: 14px; align-items: flex-start">
+<span style="flex-shrink: 0; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: #a7f070; color: #1a1c2c; border: 3px solid #0f1020; font-family: 'Press Start 2P', monospace; font-size: 14px">3</span>
+<p style="margin: 0; font-size: 20px; line-height: 1.4; color: #f4f4f4">Clear it, earn XP and unlock the next level. Beat a world to win its badge.</p>
+</div>
+</div>
+</div>
+</section>
+
+<footer style="max-width: 1200px; margin: 0 auto; padding: 24px; border-top: 4px solid #333c57">
+<p style="margin: 0; font-family: 'VT323', monospace; font-size: 20px; line-height: 1.3; color: #94b0c2">Curriculum topics inspired by the free Introduction to Linux (LFS101) course. Not affiliated with or endorsed by the Linux Foundation. Linux is a registered trademark of Linus Torvalds.</p>
+</footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1640}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var raw = [
+      { num: 1, name: 'Penguin Island', topic: 'What Linux is, the big distro families, and what happens when a machine boots.', levels: 3, cleared: 3 },
+      { num: 2, name: 'Command Caves', topic: 'Your first commands, moving around, and finding help with man pages.', levels: 5, cleared: 3 },
+      { num: 3, name: 'File Forest', topic: 'Create, copy, move and delete files. Meet permissions.', levels: 4, cleared: 0 },
+      { num: 4, name: 'Process Peaks', topic: 'Running programs, jobs, and your user environment.', levels: 4, cleared: 0 },
+      { num: 5, name: 'Text Tundra', topic: 'Editors, grep, pipes and bending text to your will.', levels: 4, cleared: 0 },
+      { num: 6, name: 'Script Castle', topic: 'Bash scripts, networking and security. The final boss lives here.', levels: 4, cleared: 0 }
+    ];
+    var worlds = raw.map(function (w) {
+      var done = w.cleared === w.levels;
+      var current = !done && w.num === 2;
+      var locked = !done && !current;
+      var pips = [];
+      for (var i = 0; i < w.levels; i++) {
+        var bg = '#1a1c2c';
+        if (i < w.cleared) bg = '#a7f070';
+        else if (current && i === w.cleared) bg = '#ffcd75';
+        pips.push({ bg: bg });
+      }
+      return {
+        num: w.num, name: w.name, topic: w.topic, pips: pips,
+        progress: w.cleared + '/' + w.levels + ' levels',
+        isDone: done, isCurrent: current, isLocked: locked,
+        chip: done ? 'CLEARED' : (current ? 'IN PROGRESS' : 'LOCKED'),
+        chipBg: done ? '#38b764' : (current ? '#ffcd75' : '#1a1c2c'),
+        chipFg: done ? '#0f1020' : (current ? '#1a1c2c' : '#c5d2db'),
+        band: done ? '#38b764' : (current ? '#41a6f6' : '#566c86'),
+        border: current ? '#ffcd75' : '#0f1020'
+      };
+    });
+    return { worlds: worlds };
+  }
+}
+</script>
+</body>
+</html>
