@@ -6,12 +6,12 @@
   padding: var(--space-6) var(--space-5);
 }
 
-.panel {
+.stage {
   width: 100%;
-  max-width: 720px;
+  max-width: 760px;
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: var(--space-4);
 }
 
 .kicker {
@@ -22,21 +22,60 @@
   color: var(--cyan);
 }
 
-.art {
-  height: 220px;
-  background: var(--sky);
+.artFrame {
+  width: 100%;
+  aspect-ratio: 16 / 9;
   border: var(--border);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  background: var(--deep);
 }
 
-.row {
+.dots {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.dot,
+.dotOn {
+  width: 12px;
+  height: 12px;
+  border: var(--border-thin);
+  background: var(--bg);
+}
+
+.dotOn {
+  background: var(--yellow);
+}
+
+.speech {
   display: flex;
   align-items: flex-start;
   gap: var(--space-4);
+  min-height: 120px;
 }
 
-.actions {
+.bubble {
+  flex: 1 1 auto;
+  min-width: 0;
+  background: var(--white);
+  color: var(--bg);
+  border: var(--border);
+  padding: var(--space-4) var(--space-4);
+  font-family: var(--font-read);
+  font-size: 22px;
+  line-height: 1.5;
+}
+
+.controls {
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.rightControls {
+  display: flex;
   gap: var(--space-4);
 }
