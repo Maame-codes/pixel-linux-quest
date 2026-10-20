@@ -77,7 +77,7 @@ export function ChallengePlayer({
 
   const showAnswer = !complete && revealStep === currentStep
   const pipLine = complete
-    ? 'You did it! The treasure map is safe. 🎉'
+    ? 'Quest complete — nice work, explorer!'
     : objectives[currentStep]?.hint ?? ''
   const answer = objectives[currentStep]?.answer ?? ''
 
