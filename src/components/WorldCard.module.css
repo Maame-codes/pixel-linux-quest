@@ -1,0 +1,78 @@
+.card {
+  background: var(--panel);
+  border: var(--border);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+}
+
+.cardCurrent {
+  border-color: var(--yellow);
+}
+
+.band {
+  height: 14px;
+}
+
+.bandDone {
+  background: var(--green);
+}
+
+.bandCurrent {
+  background: var(--sky);
+}
+
+.bandLocked {
+  background: var(--slate);
+}
+
+.body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex-grow: 1;
+}
+
+.topRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.num {
+  font-family: var(--font-head);
+  font-size: 10px;
+  color: var(--soft-text);
+}
+
+.name {
+  margin: 0;
+  font-family: var(--font-head);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--white);
+}
+
+.topic {
+  margin: 0;
+  font-size: 19px;
+  line-height: 1.4;
+  color: var(--soft-text);
+  flex-grow: 1;
+}
+
+.bottomRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-top: var(--space-1);
+}
+
+.progress {
+  font-family: var(--font-term);
+  font-size: 22px;
+  color: var(--white);
+}

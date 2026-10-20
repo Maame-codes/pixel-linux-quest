@@ -9,6 +9,7 @@ import type { Level } from '../content/types'
 import { ChallengePlayer } from '../game/ChallengePlayer'
 import { LessonPages } from '../game/LessonPages'
 import { LevelShell } from '../game/LevelShell'
+import { useProgress } from '../game/ProgressContext'
 import { QuizPlayer } from '../game/QuizPlayer'
 import styles from './PlaceholderPage.module.css'
 
@@ -19,9 +20,11 @@ function nextHrefFor(id: string): string | null {
 }
 
 function LevelRunner({ level }: { level: Level }) {
+  const { completeLevel } = useProgress()
   const [phase, setPhase] = useState<'lesson' | 'test'>('lesson')
   const nextHref = nextHrefFor(level.id)
   const clearMessage = `Nice work — you cleared ${level.title}.`
+  const onCompleted = () => completeLevel(level.id)
 
   return (
     <LevelShell level={level}>
@@ -38,7 +41,7 @@ function LevelRunner({ level }: { level: Level }) {
           clearMessage={clearMessage}
           nextHref={nextHref}
           onReviewLesson={() => setPhase('lesson')}
-          onCompleted={() => {}}
+          onCompleted={onCompleted}
         />
       ) : (
         <QuizPlayer
@@ -47,7 +50,7 @@ function LevelRunner({ level }: { level: Level }) {
           clearMessage={clearMessage}
           nextHref={nextHref}
           onReviewLesson={() => setPhase('lesson')}
-          onCompleted={() => {}}
+          onCompleted={onCompleted}
         />
       )}
     </LevelShell>

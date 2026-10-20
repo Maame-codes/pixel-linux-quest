@@ -1,0 +1,86 @@
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-head);
+  font-size: 20px;
+  color: var(--white);
+}
+
+.meta {
+  font-family: var(--font-term);
+  font-size: 22px;
+  color: var(--grey);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--space-5);
+}
+
+.badge {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-start;
+  background: var(--panel);
+  border: var(--border);
+  box-shadow: var(--shadow);
+  padding: 20px;
+}
+
+.earned {
+  border-color: var(--green);
+}
+
+.inProgress {
+  border-color: var(--yellow);
+}
+
+.soon {
+  opacity: 0.7;
+}
+
+.medal {
+  flex-shrink: 0;
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--panel-2);
+  border: var(--border-thin);
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.worldNum {
+  font-family: var(--font-head);
+  font-size: 9px;
+  color: var(--soft-text);
+}
+
+.name {
+  margin: 0;
+  font-family: var(--font-head);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--white);
+}
+
+.statusText {
+  font-family: var(--font-term);
+  font-size: 20px;
+  color: var(--soft-text);
+}

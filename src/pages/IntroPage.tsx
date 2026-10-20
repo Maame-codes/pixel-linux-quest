@@ -5,10 +5,12 @@ import { Pip } from '../components/Pip'
 import { PixelButton } from '../components/PixelButton'
 import { INTRO_SCENES } from '../content/intro'
 import { IntroArt } from '../game/IntroArt'
+import { useProgress } from '../game/ProgressContext'
 import styles from './IntroPage.module.css'
 
 export function IntroPage() {
   const navigate = useNavigate()
+  const { markIntroSeen } = useProgress()
   const [scene, setScene] = useState(0)
 
   const total = INTRO_SCENES.length
@@ -16,6 +18,7 @@ export function IntroPage() {
   const isLast = scene === total - 1
 
   function finish() {
+    markIntroSeen()
     navigate('/map')
   }
 

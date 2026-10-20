@@ -4,16 +4,17 @@ import { Link } from 'react-router-dom'
 import { XPBar } from '../components/XPBar'
 import { getWorld } from '../content/worlds'
 import type { Level } from '../content/types'
+import { useProgress } from './ProgressContext'
+import { completedCount, earnedXp, totalXp } from './progress'
 import styles from './LevelShell.module.css'
 
 type LevelShellProps = {
   level: Level
-  /** Optional header XP readout; omitted until progress is wired up. */
-  xp?: { level: number; value: number; max: number }
   children: ReactNode
 }
 
-export function LevelShell({ level, xp, children }: LevelShellProps) {
+export function LevelShell({ level, children }: LevelShellProps) {
+  const { progress } = useProgress()
   const world = getWorld(level.world)
   const worldLabel = `WORLD ${level.world}: ${(world?.name ?? '').toUpperCase()}`
   const levelLabel = `LEVEL ${level.level}: ${level.title.toUpperCase()}`
@@ -31,7 +32,11 @@ export function LevelShell({ level, xp, children }: LevelShellProps) {
               <span className={styles.level}>{levelLabel}</span>
             </div>
           </div>
-          {xp ? <XPBar level={xp.level} value={xp.value} max={xp.max} /> : null}
+          <XPBar
+            level={completedCount(progress)}
+            value={earnedXp(progress)}
+            max={totalXp()}
+          />
         </div>
       </header>
 

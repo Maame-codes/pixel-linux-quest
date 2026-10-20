@@ -1,11 +1,10 @@
 import { NavLink } from 'react-router-dom'
 
+import { useProgress } from '../game/ProgressContext'
+import { completedCount, earnedXp, totalXp } from '../game/progress'
 import { Pip } from './Pip'
 import { XPBar } from './XPBar'
 import styles from './SiteHeader.module.css'
-
-// Placeholder progress until Phase 6 wires up real localStorage state.
-const PLACEHOLDER = { level: 3, value: 340, max: 500 }
 
 const NAV = [
   { to: '/map', label: 'MAP' },
@@ -14,6 +13,7 @@ const NAV = [
 ]
 
 export function SiteHeader() {
+  const { progress } = useProgress()
   return (
     <header className={styles.header}>
       <div className={styles.inner}>
@@ -36,7 +36,7 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <XPBar level={PLACEHOLDER.level} value={PLACEHOLDER.value} max={PLACEHOLDER.max} />
+        <XPBar level={completedCount(progress)} value={earnedXp(progress)} max={totalXp()} />
       </div>
     </header>
   )
