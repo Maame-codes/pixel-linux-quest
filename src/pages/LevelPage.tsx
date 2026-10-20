@@ -9,6 +9,7 @@ import type { Level } from '../content/types'
 import { ChallengePlayer } from '../game/ChallengePlayer'
 import { LessonPages } from '../game/LessonPages'
 import { LevelShell } from '../game/LevelShell'
+import { QuizPlayer } from '../game/QuizPlayer'
 import styles from './PlaceholderPage.module.css'
 
 function nextHrefFor(id: string): string | null {
@@ -40,9 +41,14 @@ function LevelRunner({ level }: { level: Level }) {
           onCompleted={() => {}}
         />
       ) : (
-        <Panel>
-          <p className={styles.lead}>The quiz player arrives in the next phase.</p>
-        </Panel>
+        <QuizPlayer
+          test={level.test}
+          xp={level.xp}
+          clearMessage={clearMessage}
+          nextHref={nextHref}
+          onReviewLesson={() => setPhase('lesson')}
+          onCompleted={() => {}}
+        />
       )}
     </LevelShell>
   )

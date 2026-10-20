@@ -1,9 +1,10 @@
 import type { Level } from '../types'
 
+import { whatIsLinux } from './w1l1-what-is-linux'
 import { digAFolder } from './w2l4-dig-a-folder'
 
 /** Every level in the game, in play order. */
-export const LEVELS: Level[] = [digAFolder]
+export const LEVELS: Level[] = [whatIsLinux, digAFolder]
 
 const BY_ID = new Map(LEVELS.map((lvl) => [lvl.id, lvl]))
 
