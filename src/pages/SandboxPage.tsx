@@ -143,6 +143,9 @@ export function SandboxPage() {
           title={title}
           state={falling && crash ? crash.before : session.state}
           onSubmit={handleSubmit}
+          commands={ALL_COMMANDS}
+          onPrint={session.print}
+          onClearScreen={session.clearScreen}
           mapOptions={MAP_OPTIONS}
           disabled={falling}
           collapsing={falling && crash?.kind === 'destroyed'}

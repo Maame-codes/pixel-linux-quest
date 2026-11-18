@@ -19,7 +19,7 @@ Read a few short lessons with Pip the penguin, then prove what you learned by co
 ## Features
 
 - **Short lessons, then a test.** Each level is 2 to 4 tiny lesson pages, then a terminal challenge or a quiz.
-- **A pretend terminal in the browser.** A small Linux-like shell written in TypeScript, with a virtual filesystem, real-looking error messages, quotes, `*` patterns and command history.
+- **A pretend terminal in the browser.** A small Linux-like shell written in TypeScript, with a virtual filesystem, real-looking error messages, quotes, `*` patterns, Tab completion, Ctrl+C and Ctrl+L, and command history.
 - **Pip explains mistakes.** When a command fails you still see the real error, and Pip adds a short, friendly explanation without giving the answer away.
 - **Live folder map.** A pixel map of the folders sits next to the terminal, with Pip standing wherever you are.
 - **World map, XP and badges.** Worlds unlock in order. Progress is saved in your browser.

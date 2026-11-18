@@ -155,6 +155,9 @@ export function ChallengePlayer({
             title={promptTitle}
             state={session.state}
             onSubmit={handleSubmit}
+            commands={test.commands}
+            onPrint={session.print}
+            onClearScreen={session.clearScreen}
           />
 
           <div className={styles.pipRow}>

@@ -2,7 +2,7 @@
 import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 
-import { SITE_URL } from './src/site'
+import { SITE_URL } from './src/site.ts'
 
 /** Fills %SITE_URL% in index.html (link preview tags need absolute URLs). */
 function siteUrl(): Plugin {

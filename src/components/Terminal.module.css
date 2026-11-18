@@ -140,3 +140,28 @@
     animation: none;
   }
 }
+
+/* TAB, for touch screens without a Tab key. */
+.tab {
+  display: none;
+  flex-shrink: 0;
+  min-height: 44px;
+  font-family: var(--font-head);
+  font-size: 12px;
+  color: var(--white);
+  background: var(--panel);
+  padding: 12px 12px;
+  border: 3px solid var(--panel);
+  cursor: pointer;
+}
+
+.tab:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+@media (pointer: coarse) {
+  .tab {
+    display: inline-block;
+  }
+}

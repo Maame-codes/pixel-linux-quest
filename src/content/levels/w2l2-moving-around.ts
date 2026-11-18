@@ -24,6 +24,7 @@ export const movingAround: Level = {
     'Directories nest inside each other like a tree. To walk into one, use `cd NAME` ("change directory"). Use `ls` first if you want to see what is around you.',
     'To step **back up** one level, use `cd ..`. Two dots mean "the directory above this one". You can chain them: `cd ../..` goes up twice.',
     'You can also combine steps. From deep in the tree, `cd ../../lake` goes up two levels and then down into `lake`. Give it a try in the quest!',
+    'A trick to save typing: type the start of a name and press **Tab**. If only one name fits, the terminal finishes it for you, so `cd ca` becomes `cd cave/`. If several names fit, press Tab again to see them all. No Tab key on your phone? Use the TAB button.',
   ],
   test: {
     kind: 'challenge',

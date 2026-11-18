@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react'
 
-import type { TerminalLine } from '../game/useShellSession'
+import type { TerminalLine, TerminalTone } from '../game/useShellSession'
+import type { Completion } from '../shell'
 import styles from './Terminal.module.css'
 
 type TerminalProps = {
@@ -15,6 +16,12 @@ type TerminalProps = {
   disabled?: boolean
   /** Sandbox collapse: the text tumbles off the screen. */
   collapsing?: boolean
+  /** Tab completion for the text before the cursor. */
+  onComplete?: (before: string) => Completion
+  /** Add lines to the scrollback (Ctrl+C, the list of Tab matches). */
+  onPrint?: (texts: string[], tone: TerminalTone) => void
+  /** Ctrl+L. */
+  onClearScreen?: () => void
 }
 
 const toneClass: Record<TerminalLine['tone'], string> = {
@@ -24,12 +31,35 @@ const toneClass: Record<TerminalLine['tone'], string> = {
   info: styles.info,
 }
 
-export function Terminal({ lines, prompt, title, history, onSubmit, disabled, collapsing = false }: TerminalProps) {
+export function Terminal({
+  lines,
+  prompt,
+  title,
+  history,
+  onSubmit,
+  disabled,
+  collapsing = false,
+  onComplete,
+  onPrint,
+  onClearScreen,
+}: TerminalProps) {
   const [input, setInput] = useState('')
   // null = editing a fresh line; otherwise an index into history.
   const [histPos, setHistPos] = useState<number | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  // The line as it was after a Tab that found several matches: one more Tab lists them.
+  const listOnNextTab = useRef<string | null>(null)
+  // Where to put the caret after a completion changes the line.
+  const caretRef = useRef<number | null>(null)
+
+  useEffect(() => {
+    const el = inputRef.current
+    if (el && caretRef.current !== null) {
+      el.setSelectionRange(caretRef.current, caretRef.current)
+      caretRef.current = null
+    }
+  }, [input])
 
   useEffect(() => {
     const el = scrollRef.current
@@ -47,7 +77,59 @@ export function Terminal({ lines, prompt, title, history, onSubmit, disabled, co
     setHistPos(null)
   }
 
+  /** Tab: finish the word when one thing fits; a second Tab lists them when several do. */
+  function tab() {
+    if (!onComplete) return
+    const cursor = inputRef.current?.selectionStart ?? input.length
+    const before = input.slice(0, cursor)
+    const after = input.slice(cursor)
+    const { insert, matches } = onComplete(before)
+    if (insert) {
+      const next = before + insert + after
+      caretRef.current = cursor + insert.length
+      setInput(next)
+      listOnNextTab.current = matches.length > 1 ? next : null
+      return
+    }
+    if (matches.length < 2) return
+    if (listOnNextTab.current === input) {
+      onPrint?.([`${prompt} ${input}`], 'in')
+      onPrint?.([matches.join('  ')], 'out')
+      listOnNextTab.current = null
+    } else {
+      listOnNextTab.current = input
+    }
+  }
+
+  /** Ctrl+C: drop the line, like bash, unless text is selected (then it copies as usual). */
+  function cancelLine(e: KeyboardEvent<HTMLInputElement>) {
+    const el = e.currentTarget
+    if (el.selectionStart !== el.selectionEnd) return
+    e.preventDefault()
+    onPrint?.([`${prompt} ${input}^C`], 'in')
+    setInput('')
+    setHistPos(null)
+    listOnNextTab.current = null
+  }
+
   function onKeyDown(e: KeyboardEvent<HTMLInputElement>) {
+    const ctrlOnly = e.ctrlKey && !e.altKey && !e.metaKey && !e.shiftKey
+    if (ctrlOnly && e.key.toLowerCase() === 'c') {
+      cancelLine(e)
+      return
+    }
+    if (ctrlOnly && e.key.toLowerCase() === 'l') {
+      e.preventDefault()
+      onClearScreen?.()
+      return
+    }
+    // Tab completes only when there is something typed, so an empty line still lets
+    // keyboard users Tab out of the terminal. Shift+Tab always moves focus.
+    if (e.key === 'Tab' && !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey && input !== '' && onComplete) {
+      e.preventDefault()
+      tab()
+      return
+    }
     if (e.key === 'Enter') {
       e.preventDefault()
       run()
@@ -114,6 +196,22 @@ export function Terminal({ lines, prompt, title, history, onSubmit, disabled, co
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={onKeyDown}
           />
+          {onComplete ? (
+            <button
+              type="button"
+              className={styles.tab}
+              aria-label="Tab, complete the name"
+              disabled={disabled}
+              // Keep the keyboard focus (and caret) in the input.
+              onPointerDown={(e) => e.preventDefault()}
+              onClick={() => {
+                tab()
+                inputRef.current?.focus()
+              }}
+            >
+              TAB
+            </button>
+          ) : null}
           <button type="button" className={styles.run} onClick={run} disabled={disabled}>
             RUN
           </button>

@@ -32,6 +32,8 @@ export type ShellSession = {
   reset: () => void
   /** Add lines to the scrollback without running anything. */
   print: (texts: string[], tone: TerminalTone) => void
+  /** Wipe the scrollback (Ctrl+L), without running a command. */
+  clearScreen: () => void
 }
 
 function promptFor(state: ShellState): string {
@@ -105,5 +107,7 @@ export function useShellSession(opts: ShellSessionOptions): ShellSession {
     [nextId],
   )
 
-  return { lines, state, prompt: promptFor(state), submit, reset, print }
+  const clearScreen = useCallback(() => setLines([]), [])
+
+  return { lines, state, prompt: promptFor(state), submit, reset, print, clearScreen }
 }

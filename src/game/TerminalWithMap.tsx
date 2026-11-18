@@ -1,10 +1,12 @@
+import { useMemo } from 'react'
+
 import { Terminal } from '../components/Terminal'
 import { PixelButton } from '../components/PixelButton'
-import type { ShellState } from '../shell'
+import { availableCommands, complete, type ShellState } from '../shell'
 import { FolderMap } from './FolderMap'
 import type { FolderMapOptions } from './folderMapModel'
 import { useShowMap } from './mapPreference'
-import type { TerminalLine } from './useShellSession'
+import type { TerminalLine, TerminalTone } from './useShellSession'
 import styles from './TerminalWithMap.module.css'
 
 type TerminalWithMapProps = {
@@ -13,6 +15,10 @@ type TerminalWithMapProps = {
   title: string
   state: ShellState
   onSubmit: (input: string) => void
+  /** Commands unlocked here, for Tab completion. */
+  commands: readonly string[]
+  onPrint: (texts: string[], tone: TerminalTone) => void
+  onClearScreen: () => void
   mapOptions?: FolderMapOptions
   disabled?: boolean
   collapsing?: boolean
@@ -25,11 +31,15 @@ export function TerminalWithMap({
   title,
   state,
   onSubmit,
+  commands,
+  onPrint,
+  onClearScreen,
   mapOptions,
   disabled,
   collapsing,
 }: TerminalWithMapProps) {
   const [showMap, toggleMap] = useShowMap()
+  const runnable = useMemo(() => availableCommands(commands), [commands])
 
   return (
     <div className={styles.wrap}>
@@ -48,6 +58,9 @@ export function TerminalWithMap({
             onSubmit={onSubmit}
             disabled={disabled}
             collapsing={collapsing}
+            onComplete={(before) => complete(before, state, runnable)}
+            onPrint={onPrint}
+            onClearScreen={onClearScreen}
           />
         </div>
         {showMap ? (

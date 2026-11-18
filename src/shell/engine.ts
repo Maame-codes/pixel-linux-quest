@@ -13,6 +13,11 @@ import {
 /** Commands that always work, even when a level has not unlocked them. */
 const ALWAYS_AVAILABLE = ['help', 'clear', 'type']
 
+/** Every command the learner can run with these unlocked (plus the always-on ones). */
+export function availableCommands(unlocked: readonly string[]): string[] {
+  return [...new Set([...ALWAYS_AVAILABLE, ...unlocked])].sort()
+}
+
 /** Friendly Pip messages for powerful commands that unlock later. */
 const EASTER_EGGS: Record<string, string> = {
   sudo: 'sudo? Root powers unlock in World 6, Script Castle. Hang tight!',
