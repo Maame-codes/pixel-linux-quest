@@ -7,8 +7,12 @@ import { MapPage } from './pages/MapPage'
 import { LevelPage } from './pages/LevelPage'
 import { SandboxPage } from './pages/SandboxPage'
 import { BadgesPage } from './pages/BadgesPage'
+import { BreakRoomPage } from './pages/BreakRoomPage'
+import { useRememberPage } from './game/returnTo'
 
 export function App() {
+  // Remember where the learner is, so the Break Room can send them back.
+  useRememberPage()
   return (
     <ProgressProvider>
       <Routes>
@@ -18,6 +22,7 @@ export function App() {
         <Route path="/level/:id" element={<LevelPage />} />
         <Route path="/sandbox" element={<SandboxPage />} />
         <Route path="/badges" element={<BadgesPage />} />
+        <Route path="/break" element={<BreakRoomPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </ProgressProvider>

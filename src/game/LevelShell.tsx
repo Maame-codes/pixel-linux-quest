@@ -27,6 +27,9 @@ export function LevelShell({ level, children }: LevelShellProps) {
             <Link to="/map" className={styles.back}>
               &lt; MAP
             </Link>
+            <Link to="/break" className={styles.back}>
+              BREAK ROOM
+            </Link>
             <div className={styles.labels}>
               <span className={styles.world}>{worldLabel}</span>
               <span className={styles.level}>{levelLabel}</span>

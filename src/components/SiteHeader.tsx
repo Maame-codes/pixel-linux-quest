@@ -10,6 +10,7 @@ const NAV = [
   { to: '/map', label: 'MAP' },
   { to: '/sandbox', label: 'SANDBOX' },
   { to: '/badges', label: 'BADGES' },
+  { to: '/break', label: 'BREAK ROOM' },
 ]
 
 export function SiteHeader() {

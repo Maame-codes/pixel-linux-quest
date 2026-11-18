@@ -19,6 +19,8 @@ export type ShellSessionOptions = {
   welcome?: string
   /** The Break It sandbox: dangerous commands really run. */
   sandbox?: boolean
+  /** Carry on from a saved terminal (state and scrollback) instead of a fresh one. */
+  resume?: { state: ShellState; lines: TerminalLine[] } | null
 }
 
 export type ShellSession = {
@@ -50,12 +52,13 @@ function welcomeLines(opts: ShellSessionOptions, nextId: () => number): Terminal
  * scrollback and the live ShellState, and exposes submit/reset.
  */
 export function useShellSession(opts: ShellSessionOptions): ShellSession {
-  const idRef = useRef(0)
+  const resume = opts.resume ?? null
+  const idRef = useRef(resume ? Math.max(0, ...resume.lines.map((l) => l.id)) : 0)
   const nextId = useCallback(() => ++idRef.current, [])
 
-  const stateRef = useRef<ShellState>(makeInitialState(opts))
+  const stateRef = useRef<ShellState>(resume ? resume.state : makeInitialState(opts))
   const [state, setState] = useState<ShellState>(stateRef.current)
-  const [lines, setLines] = useState<TerminalLine[]>(() => welcomeLines(opts, nextId))
+  const [lines, setLines] = useState<TerminalLine[]>(() => (resume ? resume.lines : welcomeLines(opts, nextId)))
 
   const commands = opts.commands
   const sandbox = opts.sandbox ?? false

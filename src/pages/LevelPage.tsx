@@ -9,6 +9,7 @@ import type { Level } from '../content/types'
 import { ChallengePlayer } from '../game/ChallengePlayer'
 import { LessonPages } from '../game/LessonPages'
 import { LevelShell } from '../game/LevelShell'
+import { loadSnapshot } from '../game/levelSnapshots'
 import { useProgress } from '../game/ProgressContext'
 import { QuizPlayer } from '../game/QuizPlayer'
 import styles from './PlaceholderPage.module.css'
@@ -21,7 +22,8 @@ function nextHrefFor(id: string): string | null {
 
 function LevelRunner({ level }: { level: Level }) {
   const { completeLevel } = useProgress()
-  const [phase, setPhase] = useState<'lesson' | 'test'>('lesson')
+  // Straight back to the test if the learner left a challenge part way through.
+  const [phase, setPhase] = useState<'lesson' | 'test'>(() => (loadSnapshot(level.id) ? 'test' : 'lesson'))
   const nextHref = nextHrefFor(level.id)
   const clearMessage = `Nice work, you cleared ${level.title}.`
   const onCompleted = () => completeLevel(level.id)
@@ -37,6 +39,7 @@ function LevelRunner({ level }: { level: Level }) {
       ) : level.test.kind === 'challenge' ? (
         <ChallengePlayer
           test={level.test}
+          levelId={level.id}
           world={level.world}
           xp={level.xp}
           clearMessage={clearMessage}

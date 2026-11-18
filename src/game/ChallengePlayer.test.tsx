@@ -95,4 +95,30 @@ describe('ChallengePlayer', () => {
     type('ls')
     expect(screen.queryByText(/Close! Linux cares/)).not.toBeInTheDocument()
   })
+  it('keeps an unfinished run when the learner leaves and comes back', () => {
+    const view = () => (
+      <MemoryRouter>
+        <ChallengePlayer
+          test={challenge}
+          levelId="snapshot-test"
+          world={2}
+          xp={50}
+          clearMessage="Nice work."
+          nextHref={null}
+          onReviewLesson={() => {}}
+          onCompleted={() => {}}
+        />
+      </MemoryRouter>
+    )
+    const first = render(view())
+    type('ls')
+    type('mkdir treasure')
+    first.unmount()
+
+    render(view())
+    expect(screen.getByText('pip@island:~$ mkdir treasure')).toBeInTheDocument()
+    type('cd treasure')
+    type('touch map.txt')
+    expect(screen.getByText(/LEVEL CLEAR/)).toBeInTheDocument()
+  })
 })

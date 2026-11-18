@@ -5,6 +5,7 @@ import { INTRO_SCENES } from '../../content/intro'
 import type { PixelCanvas } from './canvas'
 import { SCENE_H, SCENE_W, stillFrame } from './scene'
 import { SCENES } from './scenes'
+import { CABINETS, ROOM_SCENES } from './scenes/break-room'
 import { CRASH_SCENES } from './scenes/crash'
 
 function pathsText(cv: PixelCanvas): string {
@@ -65,4 +66,26 @@ describe('intro scenes', () => {
       })
     })
   }
+})
+
+describe('break room', () => {
+  const scene = ROOM_SCENES['break-room']()
+
+  it('fills the whole 128x72 frame', () => {
+    const still = stillFrame(scene)
+    for (let y = 0; y < SCENE_H; y++) {
+      for (let x = 0; x < SCENE_W; x++) expect(still.get(x, y), `${x},${y}`).not.toBeNull()
+    }
+  })
+
+  it('has animated screens and a dozing Pip', () => {
+    const names = scene.layers.map((l) => l.name)
+    expect(names).toContain('screens')
+    expect(names).toContain('eyes')
+  })
+
+  it('has three cabinets inside the frame', () => {
+    expect(CABINETS).toHaveLength(3)
+    for (const c of CABINETS) expect(c.x + c.w).toBeLessThanOrEqual(SCENE_W)
+  })
 })

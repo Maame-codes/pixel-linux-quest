@@ -1,0 +1,209 @@
+.frame {
+  background: var(--panel);
+  border: var(--border);
+  box-shadow: var(--shadow-lg);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-width: 560px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.name {
+  margin: 0;
+  font-family: var(--font-head);
+  font-size: 14px;
+  color: var(--yellow);
+}
+
+.topButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.small {
+  min-height: 44px;
+  font-family: var(--font-head);
+  font-size: 12px;
+  color: var(--white);
+  background: var(--panel-2);
+  border: var(--border-thin);
+  padding: 0 12px;
+  cursor: pointer;
+}
+
+.small[aria-pressed='true'] {
+  color: var(--deep);
+  background: var(--lime);
+}
+
+.hud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  margin: 0;
+}
+
+.hudItem {
+  display: flex;
+  gap: var(--space-2);
+  align-items: baseline;
+}
+
+.hudItem dt {
+  font-family: var(--font-head);
+  font-size: 12px;
+  color: var(--soft-text);
+}
+
+.hudItem dd {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 20px;
+  color: var(--white);
+}
+
+.stage {
+  position: relative;
+  border: var(--border);
+  background: var(--deep);
+  line-height: 0;
+}
+
+.canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+  touch-action: none;
+  outline-offset: -3px;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: 16px;
+  text-align: center;
+  line-height: 1.5;
+  background: rgba(15, 16, 32, 0.84);
+  overflow-y: auto;
+}
+
+.over {
+  background: rgba(15, 16, 32, 0.92);
+}
+
+.howTo {
+  margin: 0;
+  max-width: 420px;
+  font-size: 18px;
+  color: var(--white);
+}
+
+.keys {
+  margin: 0;
+  font-size: 16px;
+  color: var(--soft-text);
+}
+
+.big {
+  margin: 0;
+  font-family: var(--font-head);
+  font-size: 20px;
+  color: var(--yellow);
+}
+
+.scoreLine {
+  margin: 0;
+  font-family: var(--font-head);
+  font-size: 12px;
+  color: var(--white);
+}
+
+.newBest {
+  margin: 0;
+  font-family: var(--font-head);
+  font-size: 12px;
+  color: var(--lime);
+}
+
+.tip {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  max-width: 440px;
+  background: var(--white);
+  color: var(--bg);
+  border: var(--border-thin);
+  padding: 10px 12px;
+  text-align: left;
+}
+
+.tip p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.tipLabel {
+  display: block;
+  font-family: var(--font-head);
+  font-size: 12px;
+  color: var(--panel-2);
+  margin-bottom: 4px;
+}
+
+.touch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.touchRow {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.touchBtn {
+  min-width: 56px;
+  min-height: 56px;
+  font-family: var(--font-head);
+  font-size: 14px;
+  color: var(--white);
+  background: var(--panel-2);
+  border: var(--border-thin);
+  box-shadow: 4px 4px 0 var(--deep);
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.touchBtn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 var(--deep);
+}
+
+/* Touch buttons only on touch screens. With a mouse and keyboard, the keys do the job. */
+@media (hover: hover) and (pointer: fine) {
+  .touch {
+    display: none;
+  }
+}

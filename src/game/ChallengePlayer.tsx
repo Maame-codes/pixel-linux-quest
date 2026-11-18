@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { Panel } from '../components/Panel'
 import { Pip } from '../components/Pip'
@@ -8,6 +8,7 @@ import { explainMistake, lookupCommand, shortenPath } from '../shell'
 import type { ChallengeTest } from '../content/types'
 import { useShellSession } from './useShellSession'
 import { LevelClear } from './LevelClear'
+import { clearSnapshot, loadSnapshot, saveSnapshot } from './levelSnapshots'
 import { TerminalWithMap } from './TerminalWithMap'
 import styles from './ChallengePlayer.module.css'
 
@@ -15,6 +16,8 @@ const WELCOME = 'Welcome to Pip’s pocket terminal. Type help to see what you c
 
 type ChallengePlayerProps = {
   test: ChallengeTest
+  /** Keeps an unfinished run in memory if the learner leaves and comes back. */
+  levelId?: string
   /** The level's world, so Pip can say when a command unlocks. */
   world: number
   xp: number
@@ -27,6 +30,7 @@ type ChallengePlayerProps = {
 
 export function ChallengePlayer({
   test,
+  levelId,
   world,
   xp,
   clearMessage,
@@ -34,25 +38,37 @@ export function ChallengePlayer({
   onReviewLesson,
   onCompleted,
 }: ChallengePlayerProps) {
+  // An unfinished run from earlier in this visit, if the learner popped out.
+  const [snapshot] = useState(() => (levelId ? loadSnapshot(levelId) : null))
   const sessionOpts = useMemo(
     () => ({
       commands: test.commands,
       seedFs: test.seedFs,
       startDir: test.startDir,
       welcome: WELCOME,
+      resume: snapshot,
     }),
-    [test],
+    [test, snapshot],
   )
   const session = useShellSession(sessionOpts)
 
   const objectives = test.objectives
-  const doneRef = useRef<boolean[]>(objectives.map(() => false))
+  const doneRef = useRef<boolean[]>(
+    snapshot && snapshot.done.length === objectives.length ? snapshot.done : objectives.map(() => false),
+  )
   const completeRef = useRef(false)
   const [done, setDone] = useState<boolean[]>(doneRef.current)
   const [complete, setComplete] = useState(false)
   const [revealStep, setRevealStep] = useState<number | null>(null)
   // Pip's note on the last command, if it went wrong.
   const [mistake, setMistake] = useState<string | null>(null)
+
+  // Keep the run in memory until it is finished.
+  useEffect(() => {
+    if (!levelId) return
+    if (complete) clearSnapshot(levelId)
+    else saveSnapshot(levelId, { state: session.state, lines: session.lines, done })
+  }, [levelId, complete, session.state, session.lines, done])
 
   const activeIndex = done.findIndex((d) => !d)
   const currentStep = activeIndex === -1 ? objectives.length : activeIndex
