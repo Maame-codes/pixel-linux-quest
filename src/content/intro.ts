@@ -16,7 +16,7 @@ export const INTRO_SCENES: IntroScene[] = [
   },
   {
     id: 'gnu',
-    text: '1983. Richard Stallman starts the GNU project to build a complete, free, Unix-like system. By the early 1990s it has almost every piece — except the core, called the kernel.',
+    text: '1983. Richard Stallman starts the GNU project to build a complete, free, Unix-like system. By the early 1990s it has almost every piece, except the core, called the kernel.',
   },
   {
     id: 'linus',

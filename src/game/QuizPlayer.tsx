@@ -7,6 +7,7 @@ import { QuizCard } from '../components/QuizCard'
 import { SpeechBubble } from '../components/SpeechBubble'
 import type { QuizTest } from '../content/types'
 import { LevelClear } from './LevelClear'
+import { QUIZ_PASS_PERCENT, quizPassed } from './quizScore'
 import styles from './QuizPlayer.module.css'
 
 type QuizPlayerProps = {
@@ -41,7 +42,7 @@ export function QuizPlayer({
     (n, a, i) => (a === questions[i].correct ? n + 1 : n),
     0,
   )
-  const passed = score === questions.length
+  const passed = quizPassed(score, questions.length)
 
   function choose(option: number) {
     if (answers[index] !== null) return
@@ -81,7 +82,8 @@ export function QuizPlayer({
               You scored {score} / {questions.length}
             </h2>
             <p className={styles.resultsText}>
-              So close! Review the lesson, then try the quiz again to clear the level.
+              You need {QUIZ_PASS_PERCENT}% or more to clear this level. Review the lesson, then try
+              again.
             </p>
             <div className={styles.actions}>
               <PixelButton variant="secondary" onClick={onReviewLesson}>

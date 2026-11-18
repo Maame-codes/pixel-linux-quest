@@ -8,7 +8,7 @@ export const whatIsLinux: Level = {
   blurb: 'The big idea behind Linux, and why it is everywhere.',
   xp: 40,
   lessonPages: [
-    'Linux is a free, open-source **operating system** — the software that runs a computer and lets programs use its hardware. A student named Linus Torvalds wrote the first version in 1991 and shared it with the world.',
+    'Linux is a free, open-source **operating system**: the software that runs a computer and lets programs use its hardware. A student named Linus Torvalds wrote the first version in 1991 and shared it with the world.',
     'Strictly speaking, "Linux" is the **kernel**: the core that talks to the hardware. Paired with tools from the **GNU** project, it makes a complete system, which is why you sometimes see the name **GNU/Linux**.',
     '"Open source" means anyone can read, change and share the code. A guiding idea from Unix lives on in Linux: build **small tools that each do one job well**, then combine them. You drive it all by typing commands into a **shell**.',
     'That design made Linux tough and flexible, so today it runs most web servers, the cloud, Android phones and every one of the world’s fastest supercomputers.',
@@ -55,7 +55,7 @@ export const whatIsLinux: Level = {
         ],
         correct: 1,
         explain:
-          'Linux favours small, focused tools you can combine — for example by piping one tool’s output into another.',
+          'Linux favours small, focused tools you can combine, for example by piping one tool’s output into another.',
       },
     ],
   },

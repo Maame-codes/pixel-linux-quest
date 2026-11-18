@@ -29,9 +29,14 @@ Hosted on Vercel as a static site. No backend, no accounts.
 Match the two reference screens in `design-reference/`. They are design mockups, not production code: copy the look (colors, fonts, spacing, borders, shadows, layout), not the markup or their script format.
 
 - **Palette (Sweetie 16):** bg `#1a1c2c`, deep `#0f1020`, panel `#333c57`, panel-2 `#29366f`, blue `#3b5dc9`, sky `#41a6f6`, cyan `#73eff7`, white `#f4f4f4`, soft-text `#c5d2db`, grey `#94b0c2`, slate `#566c86`, yellow `#ffcd75`, orange `#ef7d57`, lime `#a7f070`, green `#38b764`.
-- **Fonts (Google Fonts):** Press Start 2P for headings, labels and buttons (small sizes, 8 to 30px). Pixelify Sans for reading text (18 to 22px). VT323 for the terminal and numbers (20 to 24px).
+- **Fonts (Google Fonts, self-hosted):** latin woff2 files live in `src/assets/fonts/`, each with its OFL licence file next to it.
+  - **Press Start 2P** for headings, buttons, labels and chips only. Never smaller than 12px, never for paragraphs.
+  - **Atkinson Hyperlegible** (400 and 700) for reading text: lessons, Pip's bubbles, quiz options, the intro story and other body text. 20 to 22px with line-height 1.5 (small meta lines may go down to 16px).
+  - **IBM Plex Mono** (400) for the terminal and code.
+  - The design reference mockups still show the old fonts (Pixelify Sans, VT323). Follow the fonts above, not the mockups.
 - **Shapes:** no rounded corners. 3 to 4px solid `#0f1020` borders. Hard offset shadows like `6px 6px 0 #0f1020`. Images and sprites use `image-rendering: pixelated`; SVG sprites use `shape-rendering: crispEdges`.
 - **Pip the penguin:** a 16x16 pixel SVG (see reference files). Make it a `<Pip size mood />` component. Moods can come later.
+- **Intro scene art:** drawn in code on a 128x72 grid by `src/game/pixelArt/` (a TypeScript port of `design-reference/pixel-art-method.py`, which is reference only: no Python in the project). Rect and sprite helpers, characters drawn from small text maps with a colour legend, exported as one SVG path per colour. Animated overlay layers (blinking lights, Pip waddling) use CSS `steps()` animations and freeze to a still frame under `prefers-reduced-motion`. Scene 1 must stay pixel for pixel the same as `design-reference/intro-scene-1969.svg` (a test checks this). Every scene has recognisable objects, small generic pixel people where it fits, and Pip waddling somewhere. No real logos or mascots, and people are generic figures, never caricatures of real people.
 - **Core components:** PixelButton (primary yellow, secondary panel), Panel, SpeechBubble, XPBar, Chip, ProgressPips, Terminal, QuestList, QuizCard.
 - **Accessibility:** real buttons and links, labels on inputs, visible focus outline (yellow), text contrast at least 4.5:1, works at phone width (390px), respects `prefers-reduced-motion`.
 
@@ -68,6 +73,8 @@ type QuizTest = {
   questions: { prompt: string; options: string[]; correct: number; explain: string }[];
 };
 ```
+
+A quiz clears the level at 80% or more correct answers (`src/game/quizScore.ts`). With 4 questions that still means 4 out of 4, so give quizzes 5 or 10 questions if one mistake should be allowed.
 
 ## Shell engine
 
@@ -120,6 +127,7 @@ Work one phase at a time. At the end of each phase: run tests and the build, sum
 ## Rules
 
 - Keep lessons short and friendly. Assume the learner has never used a terminal.
+- No em dashes in any on-screen text (lessons, quizzes, Pip's lines, buttons, labels, the intro story). Use commas, full stops or hyphens instead.
 - Every technical fact in a lesson must be correct for a real Linux system. If unsure, say so in your summary so I can check it.
 - Keep components small and typed. No `any`.
 - Do not add dependencies without saying why.

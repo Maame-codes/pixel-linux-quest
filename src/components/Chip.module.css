@@ -1,7 +1,7 @@
 .chip {
   display: inline-block;
   font-family: var(--font-head);
-  font-size: 8px;
+  font-size: 12px;
   line-height: 1.4;
   padding: 6px 8px;
   border: var(--border-thin);
@@ -25,5 +25,5 @@
 .xp {
   background: var(--yellow);
   color: var(--bg);
-  font-size: 9px;
+  font-size: 12px;
 }

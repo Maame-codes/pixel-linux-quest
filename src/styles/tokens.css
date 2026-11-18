@@ -18,8 +18,8 @@
 
   /* Font stacks (self-hosted primary, real fallbacks) */
   --font-head: 'Press Start 2P', 'Courier New', monospace;
-  --font-read: 'Pixelify Sans', 'Trebuchet MS', 'Segoe UI', sans-serif;
-  --font-term: 'VT323', 'Courier New', monospace;
+  --font-read: 'Atkinson Hyperlegible', 'Segoe UI', Verdana, sans-serif;
+  --font-mono: 'IBM Plex Mono', Consolas, 'Courier New', monospace;
 
   /* Shapes: no rounded corners, solid dark borders, hard offset shadows */
   --border-w: 4px;

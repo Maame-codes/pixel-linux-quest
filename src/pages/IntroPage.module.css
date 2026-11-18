@@ -17,7 +17,7 @@
 .kicker {
   margin: 0;
   font-family: var(--font-head);
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 1px;
   color: var(--cyan);
 }

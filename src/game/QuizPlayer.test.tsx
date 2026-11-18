@@ -9,11 +9,11 @@ import { QuizPlayer } from './QuizPlayer'
 if (whatIsLinux.test.kind !== 'quiz') throw new Error('expected a quiz test')
 const quiz: QuizTest = whatIsLinux.test
 
-function renderQuiz(onCompleted = vi.fn()) {
+function renderQuiz(onCompleted = vi.fn(), test: QuizTest = quiz) {
   render(
     <MemoryRouter>
       <QuizPlayer
-        test={quiz}
+        test={test}
         xp={40}
         clearMessage="Done."
         nextHref={null}
@@ -52,5 +52,24 @@ describe('QuizPlayer', () => {
     expect(screen.getByText(/You scored/)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'TRY AGAIN' })).toBeInTheDocument()
     expect(onCompleted).not.toHaveBeenCalled()
+  })
+
+  it('clears at 80%: four right out of five', () => {
+    const five: QuizTest = {
+      kind: 'quiz',
+      questions: [0, 1, 2, 3, 4].map((n) => ({
+        prompt: `Question ${n}`,
+        options: [`right ${n}`, `wrong ${n}`],
+        correct: 0,
+        explain: 'Because.',
+      })),
+    }
+    const onCompleted = renderQuiz(vi.fn(), five)
+    five.questions.forEach((_, i) => {
+      const last = i === five.questions.length - 1
+      answer(i === 0 ? 'wrong 0' : `right ${i}`, last ? 'SEE RESULTS' : 'NEXT')
+    })
+    expect(screen.getByText(/LEVEL CLEAR/)).toBeInTheDocument()
+    expect(onCompleted).toHaveBeenCalledTimes(1)
   })
 })

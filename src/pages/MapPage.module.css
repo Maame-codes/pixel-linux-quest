@@ -16,7 +16,7 @@
 .kicker {
   margin: 0;
   font-family: var(--font-head);
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 1px;
   color: var(--cyan);
 }
@@ -65,8 +65,8 @@
 }
 
 .statLabel {
-  font-family: var(--font-term);
-  font-size: 20px;
+  font-family: var(--font-read);
+  font-size: 18px;
   color: var(--soft-text);
 }
 
@@ -109,8 +109,8 @@
 }
 
 .mapMeta {
-  font-family: var(--font-term);
-  font-size: 22px;
+  font-family: var(--font-read);
+  font-size: 20px;
   color: var(--grey);
 }
 

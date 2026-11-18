@@ -22,7 +22,7 @@ export const movingAround: Level = {
   xp: 50,
   lessonPages: [
     'Directories nest inside each other like a tree. To walk into one, use `cd NAME` ("change directory"). Use `ls` first if you want to see what is around you.',
-    'To step **back up** one level, use `cd ..` — two dots mean "the directory above this one". You can chain them: `cd ../..` goes up twice.',
+    'To step **back up** one level, use `cd ..`. Two dots mean "the directory above this one". You can chain them: `cd ../..` goes up twice.',
     'You can also combine steps. From deep in the tree, `cd ../../lake` goes up two levels and then down into `lake`. Give it a try in the quest!',
   ],
   test: {

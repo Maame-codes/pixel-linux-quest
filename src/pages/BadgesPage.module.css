@@ -14,8 +14,8 @@
 }
 
 .meta {
-  font-family: var(--font-term);
-  font-size: 22px;
+  font-family: var(--font-read);
+  font-size: 20px;
   color: var(--grey);
 }
 
@@ -67,7 +67,7 @@
 
 .worldNum {
   font-family: var(--font-head);
-  font-size: 9px;
+  font-size: 12px;
   color: var(--soft-text);
 }
 
@@ -80,7 +80,7 @@
 }
 
 .statusText {
-  font-family: var(--font-term);
-  font-size: 20px;
+  font-family: var(--font-read);
+  font-size: 18px;
   color: var(--soft-text);
 }

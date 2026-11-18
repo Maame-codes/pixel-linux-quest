@@ -16,7 +16,7 @@ export const firstCommands: Level = {
   world: 2,
   level: 1,
   title: 'First Commands',
-  blurb: 'Meet pwd, whoami and ls — your first three commands.',
+  blurb: 'Meet pwd, whoami and ls, your first three commands.',
   xp: 40,
   lessonPages: [
     'A **command** is a word you type and run by pressing Enter. The terminal does the job and prints the result. Let’s learn three gentle ones.',

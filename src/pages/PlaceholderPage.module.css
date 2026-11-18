@@ -14,8 +14,8 @@
 }
 
 .meta {
-  font-family: var(--font-term);
-  font-size: 22px;
+  font-family: var(--font-read);
+  font-size: 20px;
   color: var(--grey);
 }
 

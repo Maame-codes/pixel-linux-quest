@@ -38,7 +38,7 @@ export function MapPage() {
           <h1 className={styles.headline}>Learn Linux one level at a time.</h1>
           <p className={styles.blurb}>
             Type real commands in a pocket terminal, clear quests, earn XP and unlock new worlds.
-            Nothing to install — just you, Pip and the shell.
+            Nothing to install, just you, Pip and the shell.
           </p>
           <div className={styles.heroButtons}>
             <PixelButton to={continueHref}>{continueLabel}</PixelButton>

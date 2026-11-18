@@ -77,7 +77,7 @@ export function ChallengePlayer({
 
   const showAnswer = !complete && revealStep === currentStep
   const pipLine = complete
-    ? 'Quest complete — nice work, explorer!'
+    ? 'Quest complete. Nice work, explorer!'
     : objectives[currentStep]?.hint ?? ''
   const answer = objectives[currentStep]?.answer ?? ''
 

@@ -9,7 +9,7 @@ export const howItBoots: Level = {
   xp: 40,
   lessonPages: [
     'When you press the power button, the computer’s built-in **firmware** runs first. On modern machines this is called **UEFI** (older ones used **BIOS**). It does a quick hardware check and finds something to start.',
-    'The firmware hands over to a **bootloader** — on Linux this is usually **GRUB**. Its one job is to load the **Linux kernel** into memory and start it.',
+    'The firmware hands over to a **bootloader**. On Linux this is usually **GRUB**. Its one job is to load the **Linux kernel** into memory and start it.',
     'The kernel sets up the hardware, then starts the very first program, known as **init**. On most distros that is **systemd**, which has process id 1. It starts all the other services and finally shows you a **login** prompt.',
     'So the order is: **firmware → bootloader → kernel → init (systemd) → login**.',
   ],

@@ -5,3 +5,84 @@
   image-rendering: pixelated;
   shape-rendering: crispEdges;
 }
+
+/* Every layer snaps on and off with steps(), like a real sprite animation. */
+@keyframes pxBlink {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes pxFrame {
+  0% {
+    opacity: 1;
+  }
+  33.333% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.blink {
+  animation: pxBlink 1.2s steps(1, end) infinite;
+}
+
+.blinkLate {
+  animation: pxBlink 1.2s steps(1, end) infinite;
+  animation-delay: -0.6s;
+}
+
+.slow {
+  animation: pxBlink 2.4s steps(1, end) infinite;
+}
+
+.frame0,
+.frame1,
+.frame2 {
+  animation: pxFrame 1.8s steps(1, end) infinite;
+}
+
+.frame1 {
+  animation-delay: -1.2s;
+}
+
+.frame2 {
+  animation-delay: -0.6s;
+}
+
+/* Pip's two waddle frames. */
+.waddleA,
+.waddleB {
+  animation: pxBlink 0.8s steps(1, end) infinite;
+}
+
+.waddleB {
+  animation-delay: -0.4s;
+}
+
+/* Reduced motion: a still picture. The first frame of each pair stays. */
+@media (prefers-reduced-motion: reduce) {
+  .blink,
+  .slow,
+  .frame0,
+  .waddleA {
+    animation: none;
+    opacity: 1;
+  }
+
+  .blinkLate,
+  .frame1,
+  .frame2,
+  .waddleB {
+    animation: none;
+    opacity: 0;
+  }
+}

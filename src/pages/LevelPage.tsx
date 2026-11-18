@@ -23,7 +23,7 @@ function LevelRunner({ level }: { level: Level }) {
   const { completeLevel } = useProgress()
   const [phase, setPhase] = useState<'lesson' | 'test'>('lesson')
   const nextHref = nextHrefFor(level.id)
-  const clearMessage = `Nice work — you cleared ${level.title}.`
+  const clearMessage = `Nice work, you cleared ${level.title}.`
   const onCompleted = () => completeLevel(level.id)
 
   return (
