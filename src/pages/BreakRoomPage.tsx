@@ -19,6 +19,7 @@ import { IntroArt } from '../game/IntroArt'
 import { CABINETS } from '../game/pixelArt/scenes/break-room'
 import { SCENE_H, SCENE_W } from '../game/pixelArt/scene'
 import { useProgress } from '../game/ProgressContext'
+import { resetNudgeClock } from '../game/nudgeClock'
 import { questReturnPath } from '../game/returnTo'
 import styles from './BreakRoomPage.module.css'
 
@@ -41,6 +42,11 @@ export function BreakRoomPage() {
   const [roundRunning, setRoundRunning] = useState(false)
   const [, setScoresVersion] = useState(0)
   const gameRef = useRef<HTMLDivElement>(null)
+
+  // A break resets the "you have been at it a while" clock.
+  useEffect(() => {
+    resetNudgeClock()
+  }, [])
 
   // Count down once a second while the tab is visible.
   useEffect(() => {

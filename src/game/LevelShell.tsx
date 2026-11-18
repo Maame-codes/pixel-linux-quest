@@ -1,7 +1,9 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 
+import { SettingsMenu } from '../components/SettingsMenu'
 import { XPBar } from '../components/XPBar'
+import { BreakNudge } from './BreakNudge'
 import { getWorld } from '../content/worlds'
 import type { Level } from '../content/types'
 import { useProgress } from './ProgressContext'
@@ -35,15 +37,21 @@ export function LevelShell({ level, children }: LevelShellProps) {
               <span className={styles.level}>{levelLabel}</span>
             </div>
           </div>
-          <XPBar
-            level={completedCount(progress)}
-            value={earnedXp(progress)}
-            max={totalXp()}
-          />
+          <div className={styles.right}>
+            <XPBar
+              level={completedCount(progress)}
+              value={earnedXp(progress)}
+              max={totalXp()}
+            />
+            <SettingsMenu />
+          </div>
         </div>
       </header>
 
-      <main className={styles.main}>{children}</main>
+      <main className={styles.main}>
+        <BreakNudge />
+        {children}
+      </main>
     </div>
   )
 }

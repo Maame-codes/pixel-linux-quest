@@ -1,0 +1,29 @@
+.nudge {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-4);
+  background: var(--white);
+  color: var(--bg);
+  border: var(--border-thin);
+  box-shadow: var(--shadow);
+  padding: 10px 14px;
+  margin-bottom: var(--space-5);
+}
+
+.text {
+  flex: 1 1 220px;
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.btn {
+  padding: 12px 14px;
+}

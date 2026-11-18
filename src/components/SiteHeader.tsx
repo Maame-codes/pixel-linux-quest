@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom'
 import { useProgress } from '../game/ProgressContext'
 import { completedCount, earnedXp, totalXp } from '../game/progress'
 import { Pip } from './Pip'
+import { SettingsMenu } from './SettingsMenu'
 import { XPBar } from './XPBar'
 import styles from './SiteHeader.module.css'
 
@@ -37,7 +38,10 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <XPBar level={completedCount(progress)} value={earnedXp(progress)} max={totalXp()} />
+        <div className={styles.right}>
+          <XPBar level={completedCount(progress)} value={earnedXp(progress)} max={totalXp()} />
+          <SettingsMenu />
+        </div>
       </div>
     </header>
   )

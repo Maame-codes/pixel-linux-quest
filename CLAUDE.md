@@ -16,6 +16,34 @@ Hosted on Vercel as a static site. No backend, no accounts.
 5. **Level clear screen.** XP gained, badge progress, NEXT LEVEL and BACK TO MAP.
 6. **Break It sandbox** (`/sandbox`). A terminal plus the live folder map on a realistic pretend system (`src/content/sandbox.ts`: /bin, /etc, /home/pip, /var/log and so on), no objectives. **Every command the engine implements is available here** (`ALL_COMMANDS` from the registry), whatever the learner has unlocked. Dangerous commands behave like real Linux: `rm -rf /` is refused with GNU rm's preserve-root failsafe, while `rm -rf --no-preserve-root /`, `rm -rf /*` (the shell expands the `*`, so the failsafe never sees `/`) and the fork bomb break the system, with or without `sudo`. Breaking it plays a collapse animation, then a shareable SYSTEM DESTROYED or SYSTEM FROZEN screen with a RESET button. The first break earns the secret badge Chaos Penguin, shown as ??? on the badges page until then. Detection lives in `src/shell/danger.ts` (parsed, not string-matched, unit tested); outside the sandbox these commands are stopped with a friendly message.
 7. **Live folder map.** Every challenge level (and the sandbox) shows a pixel-art map of the folders next to the terminal, with Pip standing in the current folder (`src/game/folderMapModel.ts` is the pure, tested model; `FolderMap.tsx` draws it). SHOW MAP / HIDE MAP is remembered in localStorage.
+8. **Break Room** (`/break`, BREAK ROOM in the header nav and in the level header). A pixel arcade for a short break, then back to the quest. Details in "Break Room" below.
+
+## Break Room
+
+- **The room.** A 128x72 pixel scene (`src/game/pixelArt/scenes/break-room.ts`): one glowing arcade cabinet per game, a snack machine, a plant, and Pip dozing on a beanbag. Clicking a cabinet opens its game. Under the scene, every game is also a real button (name, one-line description, high score) for keyboard and screen reader users.
+- **Break timer.** A break lasts 5 minutes, shown as a small pixel clock (counts only while the tab is visible). When time is up, the current round finishes first, then Pip asks "Ready to jump back in?" with BACK TO MY QUEST and +2 MINUTES (once per break). BACK TO MY QUEST is always visible.
+- **Going back.** The last page outside the Break Room is remembered in localStorage (`src/game/returnTo.ts`). BACK TO MY QUEST goes there, or to the next playable level. Leaving never loses quest progress: completed levels are saved as always, and an unfinished challenge (terminal, files and ticked objectives) is kept in memory for the visit (`src/game/levelSnapshots.ts`), so coming back carries on where the learner left off.
+- **Break nudges.** Active time in levels is counted while the tab is visible. After 20 minutes Pip shows a small, non-blocking message above the level, "You've been at it for a while. Want a quick break?", with TAKE A BREAK (goes to `/break`) and NOT NOW (hides it for another 20 minutes). It only appears when the learner has not typed for a few seconds and the terminal input is empty, and it never covers the terminal. Opening the Break Room starts the count again.
+- **Settings.** A gear button in the header opens a small panel with break nudges on or off (default on) and sound on or off (default off), both remembered in localStorage (`src/arcade/settings.ts`).
+
+### Rules for every Break Room game (new games must follow them too)
+
+- **Original.** Original names, art and sounds. Never copy or name a real game, in name or art. Generic game types are fine.
+- **Drawing.** HTML canvas 2D with requestAnimationFrame, in the Sweetie 16 palette, crisp pixels (image smoothing off, `image-rendering: pixelated`). No new dependencies.
+- **Pure, tested logic.** Each game in `src/arcade/games/` is a `GameDef` (`src/arcade/types.ts`): a state object, a pure `update(state, input, dt)` (randomness comes from a seed stored in the state, `src/arcade/random.ts`) and a separate `draw`. Unit tests cover scoring, collisions and game over. `GameFrame.tsx` runs the loop, input, pause, sound, high scores and the game over screen, so a new game only supplies its `GameDef` and an entry in `src/arcade/games.tsx` (plus a cabinet in the room scene).
+- **Controls.** Keyboard: arrows and WASD, Space and Enter (and 1 to 9 where it fits). Touch: on-screen buttons at least 44px, or swipes or taps on the canvas. Every game has PAUSE (P or Esc) and pauses itself when the tab is hidden.
+- **Sound.** Simple 8-bit beeps with the Web Audio API (`src/arcade/sound.ts`), off by default, SOUND ON / OFF remembered in localStorage.
+- **Safety and focus.** Nothing flashes more than 3 times a second. Under `prefers-reduced-motion`, no screen shake and no big flashes, but the game stays playable.
+- **Scores.** High score per game in localStorage (`src/arcade/highScores.ts`).
+- **Game over.** Show the score, the high score, PLAY AGAIN and one short Pip's tip: a true, beginner-friendly Linux fact (`src/arcade/tips.ts`). Every tip must be correct on a real Linux system.
+- **Phones.** Works at 390px with no horizontal scrolling.
+
+### Games
+
+- **Packet Snake:** a network cable eats data packets on a grid, speeding up gently. Golden packets give bonus points for a few seconds.
+- **Bug Smash:** bugs pop out of a 3x3 grid of folders for 45 seconds, getting faster. Do not smash Pip.
+- **Bit Breaker:** paddle and ball against rows of file bricks (CORE, .BAK, .TMP, .LOG). Three lives, two-hit bricks, a rare wide-paddle power-up, and a new level when every file is cleared.
+- **Planned: Pip's Fishing, a calm game.** Not built yet. It must follow the same rules as the others.
 
 ## Tech stack
 
