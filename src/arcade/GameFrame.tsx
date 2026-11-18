@@ -49,6 +49,7 @@ export function GameFrame<S>({ game, onRoundEnd, onRoundStart, afterRound, onClo
   const phaseRef = useRef<Phase>('ready')
   const startedAt = useRef(0)
   const shake = useRef(0)
+  const hudText = useRef('')
   const reduced = useRef(prefersReducedMotion())
 
   const [phase, setPhaseState] = useState<Phase>('ready')
@@ -102,7 +103,13 @@ export function GameFrame<S>({ game, onRoundEnd, onRoundStart, afterRound, onClo
           playEvent(e)
           if ((e === 'lose' || e === 'over' || e === 'oops') && !reduced.current) shake.current = 220
         }
-        if (events.length > 0) setHud(game.hud(next))
+        // Refresh the HUD only when what it shows changes (a timer ticks once a second).
+        const hudNow = game.hud(next)
+        const text = JSON.stringify(hudNow)
+        if (text !== hudText.current) {
+          hudText.current = text
+          setHud(hudNow)
+        }
         if (game.isOver(next)) {
           const score = game.score(next)
           const isNew = recordScore(game.id, score)

@@ -48,3 +48,8 @@ export function textWidth(text: string): number {
   for (const ch of text) w += (GLYPHS[ch]?.[0].length ?? 3) + 1
   return Math.max(0, w - 1)
 }
+
+/** The rows for one glyph, or null if the font has no such character. */
+export function glyphRows(ch: string): SpriteRows | null {
+  return GLYPHS[ch] ?? null
+}

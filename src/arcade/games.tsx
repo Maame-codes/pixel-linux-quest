@@ -1,6 +1,7 @@
 import type { ComponentType } from 'react'
 
 import { GameFrame, type GameFrameProps } from './GameFrame'
+import { bugSmash } from './games/bugSmash'
 import { packetSnake } from './games/packetSnake'
 
 /** What the Break Room passes to a running game. */
@@ -26,8 +27,8 @@ export const ARCADE_GAMES: readonly ArcadeGame[] = [
   {
     id: 'bug-smash',
     name: 'Bug Smash',
-    blurb: 'Smash the bugs popping out of folders. Not Pip!',
-    Play: null,
+    blurb: bugSmash.blurb,
+    Play: (props) => <GameFrame game={bugSmash} {...props} />,
   },
   {
     id: 'bit-breaker',
