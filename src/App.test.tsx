@@ -36,8 +36,19 @@ describe('App routing', () => {
     expect(screen.getByRole('heading', { name: 'LEVEL NOT FOUND' })).toBeInTheDocument()
   })
 
-  it('redirects unknown routes back to the title screen', () => {
+  it('shows a pixel 404 page for unknown routes, with links to the map and title screen', () => {
     renderAt('/nope/not/a/page')
-    expect(screen.getByRole('heading', { name: 'PIXEL LINUX QUEST' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'This folder does not exist' })).toBeInTheDocument()
+    expect(screen.getByText(/bash: cd: \/nope\/not\/a\/page: No such file or directory/)).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'GO TO THE MAP' })).toHaveAttribute('href', '/map')
+    expect(screen.getByRole('link', { name: 'TITLE SCREEN' })).toHaveAttribute('href', '/')
+  })
+
+  it('links to the issue picker from the footer', () => {
+    renderAt('/map')
+    expect(screen.getByRole('link', { name: /suggest an idea \/ report a bug/i })).toHaveAttribute(
+      'href',
+      'https://github.com/Maame-codes/pixel-linux-quest/issues/new/choose',
+    )
   })
 })

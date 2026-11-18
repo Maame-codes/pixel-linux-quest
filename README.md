@@ -73,7 +73,7 @@ This project uses three licences, depending on what kind of thing it is.
 - `src/arcade/tips.ts` (Pip's tips)
 - `src/game/pixelArt/scenes/`, `src/game/pixelArt/sprites.ts`, `src/game/pixelArt/props.ts`, `src/game/pixelArt/font.ts` (the pixel art)
 - `src/components/Pip.tsx` (Pip's sprite)
-- `design-reference/` and `docs/screenshots/`
+- `design-reference/`, `docs/screenshots/` and the images in `public/` (link preview and favicons)
 
 Program code inside those files, such as objective checks, may also be used under MIT.
 

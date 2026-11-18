@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 
+import { FeedbackLink } from './FeedbackLink'
 import { SiteHeader } from './SiteHeader'
 import styles from './Page.module.css'
 
@@ -18,6 +19,9 @@ export function Page({ children }: PageProps) {
           Curriculum topics inspired by the free Introduction to Linux (LFS101) course. Not
           affiliated with or endorsed by the Linux Foundation. Linux is a registered trademark of
           Linus Torvalds.
+        </p>
+        <p className={styles.footerText}>
+          <FeedbackLink className={styles.footerLink} />
         </p>
       </footer>
     </div>

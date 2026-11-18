@@ -1,8 +1,9 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { PixelButton } from '../components/PixelButton'
 import type { ShellEvent } from '../shell'
 import { IntroArt } from './IntroArt'
+import { browserShareEnv, crashShareText, shareOrCopy } from './share'
 import styles from './CrashScreen.module.css'
 
 type CrashScreenProps = {
@@ -36,6 +37,37 @@ function explanation(kind: ShellEvent, sudo: boolean): string[] {
     'With sudo in front, it deletes everything, and the computer would not start again until Linux was reinstalled.',
     'rm has no recycle bin, so there is no easy way to get files back.',
   ]
+}
+
+const SHARE_MESSAGES = {
+  copied: 'Copied!',
+  failed: 'Could not copy. Try a screenshot instead!',
+} as const
+
+/** SHARE: the share sheet on phones, the clipboard everywhere else. */
+function ShareButton({ command }: { command: string }) {
+  const [message, setMessage] = useState<keyof typeof SHARE_MESSAGES | null>(null)
+  useEffect(() => {
+    if (!message) return
+    const t = window.setTimeout(() => setMessage(null), 2500)
+    return () => window.clearTimeout(t)
+  }, [message])
+
+  const onShare = async () => {
+    const outcome = await shareOrCopy(crashShareText(command), browserShareEnv())
+    if (outcome === 'copied' || outcome === 'failed') setMessage(outcome)
+  }
+
+  return (
+    <>
+      <PixelButton onClick={() => void onShare()} variant="secondary">
+        SHARE
+      </PixelButton>
+      <p className={styles.shareStatus} role="status">
+        {message ? SHARE_MESSAGES[message] : ''}
+      </p>
+    </>
+  )
 }
 
 /** The shareable "you broke it" screen, with a RESET button. */
@@ -77,6 +109,7 @@ export function CrashScreen({ kind, command, sudo, newBadge, onReset }: CrashScr
         <PixelButton to="/badges" variant="secondary">
           BADGES
         </PixelButton>
+        <ShareButton command={command} />
       </div>
 
       <p className={styles.credit}>PIXEL LINUX QUEST · BREAK IT SANDBOX</p>

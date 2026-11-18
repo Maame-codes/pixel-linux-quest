@@ -77,3 +77,11 @@
   color: var(--deep);
   background: var(--lime);
 }
+
+.feedback {
+  display: block;
+  padding: 8px 0 0;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--cyan);
+}

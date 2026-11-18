@@ -1,0 +1,80 @@
+.lost {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  text-align: center;
+  padding: var(--space-6) 0;
+}
+
+.pip {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.question {
+  color: var(--yellow);
+  shape-rendering: crispEdges;
+  animation: bob 1.2s steps(2) infinite;
+}
+
+@keyframes bob {
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .question {
+    animation: none;
+  }
+}
+
+.code {
+  margin: 0;
+  font-family: var(--font-head);
+  font-size: 40px;
+  color: var(--orange);
+  text-shadow: 4px 4px 0 var(--deep);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-head);
+  font-size: 18px;
+  line-height: 1.5;
+  color: var(--white);
+}
+
+.terminal {
+  margin: 0;
+  max-width: 100%;
+  font-family: var(--font-mono);
+  font-size: 16px;
+  line-height: 1.6;
+  text-align: left;
+  color: var(--soft-text);
+  background: var(--deep);
+  border: var(--border-thin);
+  padding: 10px 14px;
+  overflow-wrap: anywhere;
+}
+
+.prompt {
+  color: var(--lime);
+}
+
+.lead {
+  margin: 0;
+  font-size: 20px;
+  line-height: 1.5;
+  color: var(--soft-text);
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-4);
+}

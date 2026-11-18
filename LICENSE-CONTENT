@@ -25,6 +25,7 @@ What this covers
 - src/components/Pip.tsx  The sprite data for Pip the penguin.
 - design-reference/       The design mockups and reference pixel art.
 - docs/screenshots/       Screenshots of the game.
+- public/                 The link preview image and the Pip favicons.
 
 Program code inside those files (for example the objective check functions
 in src/content/ and the drawing helpers) may also be used under the MIT

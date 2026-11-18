@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Route, Routes } from 'react-router-dom'
 
 import { ProgressProvider } from './game/ProgressContext'
 import { TitlePage } from './pages/TitlePage'
@@ -8,6 +8,7 @@ import { LevelPage } from './pages/LevelPage'
 import { SandboxPage } from './pages/SandboxPage'
 import { BadgesPage } from './pages/BadgesPage'
 import { BreakRoomPage } from './pages/BreakRoomPage'
+import { NotFoundPage } from './pages/NotFoundPage'
 import { useRememberPage } from './game/returnTo'
 
 export function App() {
@@ -23,7 +24,7 @@ export function App() {
         <Route path="/sandbox" element={<SandboxPage />} />
         <Route path="/badges" element={<BadgesPage />} />
         <Route path="/break" element={<BreakRoomPage />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </ProgressProvider>
   )

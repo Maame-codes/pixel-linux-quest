@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react'
 
 import { useSetting } from '../arcade/settings'
+import { FeedbackLink } from './FeedbackLink'
 import styles from './SettingsMenu.module.css'
 
 /** A pixel gear, 9x9. */
@@ -71,6 +72,7 @@ export function SettingsMenu() {
           <p className={styles.title}>SETTINGS</p>
           <Toggle label="Break nudges" on={nudges} onChange={setNudges} />
           <Toggle label="Sound" on={sound} onChange={setSound} />
+          <FeedbackLink className={styles.feedback} />
         </div>
       ) : null}
     </div>

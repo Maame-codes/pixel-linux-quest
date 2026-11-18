@@ -60,6 +60,23 @@ describe('SandboxPage', () => {
     expect(screen.getByText(/^bin\s+boot/)).toBeInTheDocument()
   })
 
+  it('SHARE copies the brag text with the command and shows Copied!', async () => {
+    setReducedMotion(true)
+    const writeText = vi.fn(() => Promise.resolve())
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true })
+    renderPage()
+    type('sudo rm -rf /*')
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'SHARE' }))
+    })
+    expect(writeText).toHaveBeenCalledWith(
+      expect.stringMatching(
+        /^I just destroyed Linux with sudo rm -rf \/\* in Pixel Linux Quest\. Can you break it too\? https:\/\//,
+      ),
+    )
+    expect(screen.getByText('Copied!')).toBeInTheDocument()
+  })
+
   it('plays the collapse first when motion is allowed', () => {
     vi.useFakeTimers()
     setReducedMotion(false)
