@@ -41,12 +41,12 @@ describe('QuizPlayer', () => {
     expect(onCompleted).toHaveBeenCalledTimes(1)
   })
 
-  it('offers a retry when an answer is wrong', () => {
+  it('offers a retry when too many answers are wrong', () => {
     const onCompleted = renderQuiz()
     quiz.questions.forEach((q, i) => {
       const last = i === quiz.questions.length - 1
-      // Deliberately pick a wrong option on the first question.
-      const pick = i === 0 ? q.options[(q.correct + 1) % q.options.length] : q.options[q.correct]
+      // Two wrong answers out of five is 60%, under the 80% needed.
+      const pick = i < 2 ? q.options[(q.correct + 1) % q.options.length] : q.options[q.correct]
       answer(pick, last ? 'SEE RESULTS' : 'NEXT')
     })
     expect(screen.getByText(/You scored/)).toBeInTheDocument()

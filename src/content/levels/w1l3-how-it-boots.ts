@@ -55,6 +55,12 @@ export const howItBoots: Level = {
         correct: 1,
         explain: 'Firmware, then bootloader, then kernel, then init (systemd), then the login prompt.',
       },
+      {
+        prompt: 'Before UEFI, what was the firmware on most PCs called?',
+        options: ['GRUB', 'systemd', 'BIOS', 'bash'],
+        correct: 2,
+        explain: 'Older PCs used BIOS. Modern ones use UEFI, which does the same first job: check the hardware and start the bootloader.',
+      },
     ],
   },
 }

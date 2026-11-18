@@ -57,6 +57,12 @@ export const whatIsLinux: Level = {
         explain:
           'Linux favours small, focused tools you can combine, for example by piping one tool’s output into another.',
       },
+      {
+        prompt: 'What do you use to type commands for Linux to run?',
+        options: ['A shell', 'A bootloader', 'A package', 'The firmware'],
+        correct: 0,
+        explain: 'A shell, such as bash, reads each command you type and runs it.',
+      },
     ],
   },
 }

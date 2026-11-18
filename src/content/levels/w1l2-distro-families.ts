@@ -49,6 +49,12 @@ export const distroFamilies: Level = {
         correct: 0,
         explain: 'They share the Linux kernel; what differs is the software and how it is packaged.',
       },
+      {
+        prompt: 'Which family does Fedora belong to?',
+        options: ['Debian family', 'Red Hat family', 'Arch family', 'SUSE family'],
+        correct: 1,
+        explain: 'Fedora is in the Red Hat family, with RHEL and Rocky Linux. It installs software with dnf and .rpm packages.',
+      },
     ],
   },
 }

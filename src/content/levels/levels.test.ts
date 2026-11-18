@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { createShellState, runCommand } from '../../shell'
+import { quizPassed } from '../../game/quizScore'
 import { LEVELS } from './index'
 
 describe('level content', () => {
@@ -44,4 +45,16 @@ describe('level content', () => {
       }
     })
   }
+})
+
+describe('World 1 quizzes', () => {
+  it('allow one mistake under the 80% rule', () => {
+    const quizzes = LEVELS.filter((l) => l.world === 1 && l.test.kind === 'quiz')
+    expect(quizzes).toHaveLength(3)
+    for (const lvl of quizzes) {
+      if (lvl.test.kind !== 'quiz') continue
+      const total = lvl.test.questions.length
+      expect(quizPassed(total - 1, total), lvl.id).toBe(true)
+    }
+  })
 })

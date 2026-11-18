@@ -75,7 +75,7 @@ type QuizTest = {
 };
 ```
 
-A quiz clears the level at 80% or more correct answers (`src/game/quizScore.ts`). With 4 questions that still means 4 out of 4, so give quizzes 5 or 10 questions if one mistake should be allowed.
+A quiz clears the level at 80% or more correct answers (`src/game/quizScore.ts`). With 4 questions that still means 4 out of 4, so quizzes have 5 (or 10) questions: then one mistake in five is allowed. The World 1 quizzes have 5.
 
 ## Shell engine
 
@@ -114,6 +114,11 @@ Topic order is inspired by the free Introduction to Linux (LFS101) course, but e
 - **World 5, Text Tundra:** redirection, `grep`, pipes, `sort`, `uniq`, `wc`, `cut`.
 - **World 6, Script Castle:** first Bash script, variables, if and loops, networking basics (`ping`, `ip`, simulated output), local security (users, root, `sudo`). Final boss level mixes everything.
 - **Side quests (optional quizzes):** desktop environments, common applications, printing.
+
+### Design rules for World 3 onwards
+
+- **Mission framing.** Each world is told as real-world jobs, not abstract exercises. For example: "The website is down. Find the error in the logs." or "Lock this file so only you can read it." Objectives and Pip's lines follow the mission.
+- **Boss level.** Every world ends with a boss level: a harder, timed challenge that mixes everything learned in that world. The learner can retry as often as they like, with no penalty for running out of time or retrying.
 
 ## Build phases
 
