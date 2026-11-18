@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type KeyboardEvent } from 'react'
+import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react'
 
 import type { TerminalLine } from '../game/useShellSession'
 import styles from './Terminal.module.css'
@@ -13,6 +13,8 @@ type TerminalProps = {
   history: string[]
   onSubmit: (input: string) => void
   disabled?: boolean
+  /** Sandbox collapse: the text tumbles off the screen. */
+  collapsing?: boolean
 }
 
 const toneClass: Record<TerminalLine['tone'], string> = {
@@ -22,7 +24,7 @@ const toneClass: Record<TerminalLine['tone'], string> = {
   info: styles.info,
 }
 
-export function Terminal({ lines, prompt, title, history, onSubmit, disabled }: TerminalProps) {
+export function Terminal({ lines, prompt, title, history, onSubmit, disabled, collapsing = false }: TerminalProps) {
   const [input, setInput] = useState('')
   // null = editing a fresh line; otherwise an index into history.
   const [histPos, setHistPos] = useState<number | null>(null)
@@ -82,9 +84,13 @@ export function Terminal({ lines, prompt, title, history, onSubmit, disabled }: 
         <span className={styles.barTitle}>{title}</span>
       </div>
 
-      <div className={styles.screen} ref={scrollRef}>
-        {lines.map((line) => (
-          <div key={line.id} className={`${styles.line} ${toneClass[line.tone]}`}>
+      <div className={`${styles.screen} ${collapsing ? styles.collapsing : ''}`} ref={scrollRef}>
+        {lines.map((line, i) => (
+          <div
+            key={line.id}
+            className={`${styles.line} ${toneClass[line.tone]}`}
+            style={collapsing ? ({ '--i': lines.length - i } as CSSProperties) : undefined}
+          >
             {line.text === '' ? ' ' : line.text}
           </div>
         ))}

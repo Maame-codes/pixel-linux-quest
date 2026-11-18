@@ -1,0 +1,33 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.toggle {
+  padding: 10px 14px;
+}
+
+/* Side by side when there is room; the map wraps below the terminal on phones. */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-5);
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.term {
+  flex: 3 1 420px;
+  min-width: 0;
+}
+
+.map {
+  flex: 1 1 260px;
+}

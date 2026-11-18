@@ -41,4 +41,33 @@ describe('ChallengePlayer', () => {
     expect(screen.getByText(/LEVEL CLEAR/)).toBeInTheDocument()
     expect(onCompleted).toHaveBeenCalledTimes(1)
   })
+
+  it('shows a live folder map that follows Pip and can be hidden', () => {
+    localStorage.clear()
+    render(
+      <MemoryRouter>
+        <ChallengePlayer
+          test={challenge}
+          xp={50}
+          clearMessage="Nice work."
+          nextHref={null}
+          onReviewLesson={() => {}}
+          onCompleted={() => {}}
+        />
+      </MemoryRouter>,
+    )
+    const map = screen.getByRole('region', { name: 'MAP' })
+    expect(map).toHaveTextContent('/home/pip, folder (you are here)')
+
+    type('mkdir treasure')
+    type('cd treasure')
+    expect(map).toHaveTextContent('treasure, folder, in /home/pip (you are here)')
+    expect(screen.getByText('You are in /home/pip/treasure')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'HIDE MAP' }))
+    expect(screen.queryByRole('region', { name: 'MAP' })).not.toBeInTheDocument()
+    expect(localStorage.getItem('plq.showMap')).toBe('hidden')
+    fireEvent.click(screen.getByRole('button', { name: 'SHOW MAP' }))
+    expect(screen.getByRole('region', { name: 'MAP' })).toBeInTheDocument()
+  })
 })

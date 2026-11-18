@@ -4,11 +4,11 @@ import { Panel } from '../components/Panel'
 import { Pip } from '../components/Pip'
 import { PixelButton } from '../components/PixelButton'
 import { QuestList } from '../components/QuestList'
-import { Terminal } from '../components/Terminal'
 import { lookupCommand, shortenPath } from '../shell'
 import type { ChallengeTest } from '../content/types'
 import { useShellSession } from './useShellSession'
 import { LevelClear } from './LevelClear'
+import { TerminalWithMap } from './TerminalWithMap'
 import styles from './ChallengePlayer.module.css'
 
 const WELCOME = 'Welcome to Pip’s pocket terminal. Type help to see what you can do.'
@@ -126,11 +126,11 @@ export function ChallengePlayer({
         </div>
 
         <div className={styles.main}>
-          <Terminal
+          <TerminalWithMap
             lines={session.lines}
             prompt={session.prompt}
             title={promptTitle}
-            history={session.state.history}
+            state={session.state}
             onSubmit={handleSubmit}
           />
 
