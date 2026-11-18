@@ -1,6 +1,7 @@
 import type { ComponentType } from 'react'
 
 import { GameFrame, type GameFrameProps } from './GameFrame'
+import { bitBreaker } from './games/bitBreaker'
 import { bugSmash } from './games/bugSmash'
 import { packetSnake } from './games/packetSnake'
 
@@ -33,7 +34,7 @@ export const ARCADE_GAMES: readonly ArcadeGame[] = [
   {
     id: 'bit-breaker',
     name: 'Bit Breaker',
-    blurb: 'Bounce a ball to clear out old files.',
-    Play: null,
+    blurb: bitBreaker.blurb,
+    Play: (props) => <GameFrame game={bitBreaker} {...props} />,
   },
 ]
