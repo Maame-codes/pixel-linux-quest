@@ -84,3 +84,26 @@
   font-size: 18px;
   color: var(--soft-text);
 }
+
+.secretHidden {
+  border-style: dashed;
+  border-color: var(--slate);
+}
+
+.secretEarned {
+  border-color: var(--orange);
+}
+
+.secretMedal {
+  background: var(--deep);
+}
+
+.secretEarned .secretMedal {
+  background: var(--orange);
+}
+
+.mystery {
+  font-family: var(--font-head);
+  font-size: 28px;
+  color: var(--slate);
+}

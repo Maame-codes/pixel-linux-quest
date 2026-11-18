@@ -1,6 +1,7 @@
 import type { ColourPath } from './pixelArt/canvas'
 import { type LayerAnim, SCENE_H, SCENE_W } from './pixelArt/scene'
 import { SCENES } from './pixelArt/scenes'
+import { CRASH_SCENES } from './pixelArt/scenes/crash'
 import styles from './IntroArt.module.css'
 
 type RenderedScene = {
@@ -26,7 +27,7 @@ const cache = new Map<string, RenderedScene>()
 function renderScene(sceneId: string): RenderedScene {
   const cached = cache.get(sceneId)
   if (cached) return cached
-  const build = SCENES[sceneId] ?? SCENES.unix
+  const build = SCENES[sceneId] ?? CRASH_SCENES[sceneId] ?? SCENES.unix
   const scene = build()
   const rendered: RenderedScene = {
     label: scene.label,

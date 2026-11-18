@@ -28,6 +28,8 @@ export type ShellSession = {
   /** Run a command line; returns the result and the state it ran in. */
   submit: (input: string) => { result: CommandResult; before: ShellState }
   reset: () => void
+  /** Add lines to the scrollback without running anything. */
+  print: (texts: string[], tone: TerminalTone) => void
 }
 
 function promptFor(state: ShellState): string {
@@ -93,5 +95,12 @@ export function useShellSession(opts: ShellSessionOptions): ShellSession {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nextId])
 
-  return { lines, state, prompt: promptFor(state), submit, reset }
+  const print = useCallback(
+    (texts: string[], tone: TerminalTone) => {
+      setLines((prev) => [...prev, ...texts.map((text) => ({ id: nextId(), text, tone }))])
+    },
+    [nextId],
+  )
+
+  return { lines, state, prompt: promptFor(state), submit, reset, print }
 }

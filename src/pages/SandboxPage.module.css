@@ -1,0 +1,111 @@
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-head);
+  font-size: 20px;
+  color: var(--white);
+}
+
+.reset {
+  padding: 10px 14px;
+}
+
+.lead {
+  margin: 0;
+  font-size: 20px;
+  line-height: 1.5;
+  color: var(--soft-text);
+  max-width: 760px;
+}
+
+.play {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.pipRow {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-4);
+}
+
+.bubble {
+  flex: 1 1 auto;
+  min-width: 0;
+  background: var(--white);
+  color: var(--bg);
+  border: var(--border);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.label {
+  font-family: var(--font-head);
+  font-size: 12px;
+  color: var(--panel-2);
+}
+
+.body {
+  font-family: var(--font-read);
+  font-size: 20px;
+  line-height: 1.5;
+}
+
+/* Pip panics while the system falls apart. */
+.panic {
+  display: inline-block;
+  line-height: 0;
+  animation: panic 0.24s steps(2, end) infinite;
+}
+
+@keyframes panic {
+  0% {
+    transform: translate(-4px, 0);
+  }
+  50% {
+    transform: translate(4px, -3px);
+  }
+}
+
+/* Fork bomb: frost creeps over everything in hard steps. */
+.freezing::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(115, 239, 247, 0.35) 0 8px,
+    rgba(65, 166, 246, 0.25) 8px 16px
+  );
+  animation: frost 2s steps(5, end) both;
+}
+
+@keyframes frost {
+  0% {
+    opacity: 0;
+    clip-path: inset(0 0 100% 0);
+  }
+  100% {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panic,
+  .freezing::after {
+    animation: none;
+  }
+}

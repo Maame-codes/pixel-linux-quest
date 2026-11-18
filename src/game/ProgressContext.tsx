@@ -6,6 +6,8 @@ type ProgressContextValue = {
   progress: Progress
   completeLevel: (id: string) => void
   markIntroSeen: () => void
+  /** Earn a secret badge (does nothing if already earned). */
+  earnSecret: (id: string) => void
   resetProgress: () => void
 }
 
@@ -26,13 +28,17 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     setProgress((p) => (p.introSeen ? p : { ...p, introSeen: true }))
   }, [])
 
+  const earnSecret = useCallback((id: string) => {
+    setProgress((p) => (p.secrets[id] ? p : { ...p, secrets: { ...p.secrets, [id]: true } }))
+  }, [])
+
   const resetProgress = useCallback(() => {
     setProgress(defaultProgress())
   }, [])
 
   const value = useMemo(
-    () => ({ progress, completeLevel, markIntroSeen, resetProgress }),
-    [progress, completeLevel, markIntroSeen, resetProgress],
+    () => ({ progress, completeLevel, markIntroSeen, earnSecret, resetProgress }),
+    [progress, completeLevel, markIntroSeen, earnSecret, resetProgress],
   )
 
   return <ProgressContext.Provider value={value}>{children}</ProgressContext.Provider>

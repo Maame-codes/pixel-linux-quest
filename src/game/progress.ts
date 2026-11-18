@@ -6,13 +6,15 @@ export type Progress = {
   /** Map of completed level ids. */
   completed: Record<string, true>
   introSeen: boolean
+  /** Secret badges earned, by id (added in the same version; missing means none). */
+  secrets: Record<string, true>
 }
 
 const KEY = 'plq.progress'
 const VERSION = 1
 
 export function defaultProgress(): Progress {
-  return { version: VERSION, completed: {}, introSeen: false }
+  return { version: VERSION, completed: {}, introSeen: false, secrets: {} }
 }
 
 /** Load progress from localStorage, falling back to a clean slate on any problem. */
@@ -26,7 +28,11 @@ export function loadProgress(): Progress {
     }
     const completed: Record<string, true> = {}
     for (const id of Object.keys(parsed.completed ?? {})) completed[id] = true
-    return { version: VERSION, completed, introSeen: Boolean(parsed.introSeen) }
+    const secrets: Record<string, true> = {}
+    if (parsed.secrets && typeof parsed.secrets === 'object') {
+      for (const id of Object.keys(parsed.secrets)) secrets[id] = true
+    }
+    return { version: VERSION, completed, introSeen: Boolean(parsed.introSeen), secrets }
   } catch {
     return defaultProgress()
   }
@@ -120,4 +126,21 @@ export function badges(p: Progress): Badge[] {
     const cleared = worldClearedCount(p, w.num)
     return { world: w.num, name: w.name, cleared, total, earned: total > 0 && cleared === total }
   })
+}
+
+export type SecretBadge = {
+  id: string
+  name: string
+  /** What you did to earn it, shown once it is earned. */
+  how: string
+  earned: boolean
+}
+
+/** Badges that stay hidden (shown as ???) until earned. */
+export const SECRET_BADGES: readonly Omit<SecretBadge, 'earned'>[] = [
+  { id: 'chaos-penguin', name: 'Chaos Penguin', how: 'Broke the Break It sandbox on purpose.' },
+]
+
+export function secretBadges(p: Progress): SecretBadge[] {
+  return SECRET_BADGES.map((b) => ({ ...b, earned: Boolean(p.secrets[b.id]) }))
 }

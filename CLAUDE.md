@@ -14,7 +14,8 @@ Hosted on Vercel as a static site. No backend, no accounts.
    - **Test:** either a **terminal challenge** (quest objectives checked against the simulated shell) or a **quiz** (multiple choice, for topics that can't be practised in a terminal, like history or distros).
    - Learner can go back to the lesson pages during the test.
 5. **Level clear screen.** XP gained, badge progress, NEXT LEVEL and BACK TO MAP.
-6. **Free play sandbox.** An open terminal with every command unlocked so far, no objectives.
+6. **Break It sandbox** (`/sandbox`). A terminal plus the live folder map on a realistic pretend system (`src/content/sandbox.ts`: /bin, /etc, /home/pip, /var/log and so on), no objectives. **Every command the engine implements is available here** (`ALL_COMMANDS` from the registry), whatever the learner has unlocked. Dangerous commands behave like real Linux: `rm -rf /` is refused with GNU rm's preserve-root failsafe, while `rm -rf --no-preserve-root /`, `rm -rf /*` (the shell expands the `*`, so the failsafe never sees `/`) and the fork bomb break the system, with or without `sudo`. Breaking it plays a collapse animation, then a shareable SYSTEM DESTROYED or SYSTEM FROZEN screen with a RESET button. The first break earns the secret badge Chaos Penguin, shown as ??? on the badges page until then. Detection lives in `src/shell/danger.ts` (parsed, not string-matched, unit tested); outside the sandbox these commands are stopped with a friendly message.
+7. **Live folder map.** Every challenge level (and the sandbox) shows a pixel-art map of the folders next to the terminal, with Pip standing in the current folder (`src/game/folderMapModel.ts` is the pure, tested model; `FolderMap.tsx` draws it). SHOW MAP / HIDE MAP is remembered in localStorage.
 
 ## Tech stack
 
@@ -86,6 +87,7 @@ A quiz clears the level at 80% or more correct answers (`src/game/quizScore.ts`)
 - Error messages should look like real Linux messages.
 - Command lines are split like bash does it (`src/shell/parse.ts`): quotes, backslash escapes, and `*` / `?` patterns expanded against the filesystem.
 - **Pip explains mistakes.** When a command fails, the terminal still shows the real error, and Pip adds a short, friendly explanation in the speech bubble (`src/shell/explain.ts`, one test per rule). Explanations point at the mistake and never give away the answer to the current objective. Only say a command does not exist on Linux if that is true (`dir` and `type` do exist).
+- `rm` is implemented (`-r`, `-f`, `-d`, `-v`, `--no-preserve-root`) with GNU error messages, but stays locked in levels until World 3. `sudo COMMAND` runs the command as root. `type` and `dir` exist because they exist on real Linux.
 - Fun easter eggs are welcome (`sudo` and `rm` before they are unlocked give friendly Pip messages).
 - Terminal UI: command history with up/down arrows, Enter runs, a RUN button for touch screens, auto scroll to bottom, `clear` works.
 
@@ -124,7 +126,7 @@ Work one phase at a time. At the end of each phase: run tests and the build, sum
 5. Title screen and intro story cutscene.
 6. Progress, XP, unlocks and badges in localStorage. World map matching `design-reference/home-world-map.html`.
 7. Content for Worlds 1 and 2. Then the remaining worlds, one world per session.
-8. Free play sandbox, polish, mobile check, accessibility pass.
+8. Sandbox polish, mobile check, accessibility pass.
 
 ## Rules
 

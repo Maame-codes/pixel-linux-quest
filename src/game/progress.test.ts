@@ -9,6 +9,7 @@ import {
   loadProgress,
   nextPlayableLevel,
   saveProgress,
+  secretBadges,
   worldStatus,
   type Progress,
 } from './progress'
@@ -18,7 +19,7 @@ const W1 = ['w1-l1-what-is-linux', 'w1-l2-distro-families', 'w1-l3-how-it-boots'
 function withCompleted(ids: string[]): Progress {
   const completed: Record<string, true> = {}
   for (const id of ids) completed[id] = true
-  return { version: 1, completed, introSeen: false }
+  return { version: 1, completed, introSeen: false, secrets: {} }
 }
 
 describe('unlock rules', () => {
@@ -83,5 +84,23 @@ describe('persistence', () => {
   it('falls back to defaults on corrupt data', () => {
     localStorage.setItem('plq.progress', '{ not json')
     expect(loadProgress()).toEqual(defaultProgress())
+  })
+})
+
+describe('secret badges', () => {
+  beforeEach(() => localStorage.clear())
+
+  it('Chaos Penguin is hidden until earned, then saved', () => {
+    const p = withCompleted([])
+    expect(secretBadges(p)).toEqual([expect.objectContaining({ id: 'chaos-penguin', earned: false })])
+    saveProgress({ ...p, secrets: { 'chaos-penguin': true } })
+    expect(secretBadges(loadProgress())[0].earned).toBe(true)
+  })
+
+  it('loads older saved progress that has no secrets yet', () => {
+    localStorage.setItem('plq.progress', JSON.stringify({ version: 1, completed: { 'w1-l1-what-is-linux': true }, introSeen: true }))
+    const p = loadProgress()
+    expect(p.secrets).toEqual({})
+    expect(p.completed['w1-l1-what-is-linux']).toBe(true)
   })
 })

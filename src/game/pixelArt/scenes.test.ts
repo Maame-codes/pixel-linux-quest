@@ -5,6 +5,7 @@ import { INTRO_SCENES } from '../../content/intro'
 import type { PixelCanvas } from './canvas'
 import { SCENE_H, SCENE_W, stillFrame } from './scene'
 import { SCENES } from './scenes'
+import { CRASH_SCENES } from './scenes/crash'
 
 function pathsText(cv: PixelCanvas): string {
   return cv
@@ -38,7 +39,7 @@ describe('intro scenes', () => {
     }
   })
 
-  for (const [id, build] of Object.entries(SCENES)) {
+  for (const [id, build] of Object.entries({ ...SCENES, ...CRASH_SCENES })) {
     describe(id, () => {
       const scene = build()
 

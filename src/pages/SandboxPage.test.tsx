@@ -1,0 +1,82 @@
+import { act, fireEvent, render, screen } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { ProgressProvider } from '../game/ProgressContext'
+import { SandboxPage } from './SandboxPage'
+
+function type(command: string) {
+  const input = screen.getByRole('textbox')
+  fireEvent.change(input, { target: { value: command } })
+  fireEvent.keyDown(input, { key: 'Enter' })
+}
+
+function setReducedMotion(reduce: boolean) {
+  window.matchMedia = vi.fn().mockReturnValue({ matches: reduce }) as unknown as typeof window.matchMedia
+}
+
+function renderPage() {
+  render(
+    <MemoryRouter>
+      <ProgressProvider>
+        <SandboxPage />
+      </ProgressProvider>
+    </MemoryRouter>,
+  )
+}
+
+describe('SandboxPage', () => {
+  beforeEach(() => localStorage.clear())
+  afterEach(() => vi.useRealTimers())
+
+  it('has a realistic filesystem and every command', () => {
+    setReducedMotion(true)
+    renderPage()
+    type('ls /')
+    expect(screen.getByText(/^bin\s+boot\s+dev\s+etc\s+home\s+lib\s+root\s+sbin\s+tmp\s+usr\s+var$/)).toBeInTheDocument()
+    type('cat /etc/hostname')
+    expect(screen.getByText('island')).toBeInTheDocument()
+  })
+
+  it('rm -rf / is refused with the GNU message, and Pip explains', () => {
+    setReducedMotion(true)
+    renderPage()
+    type('rm -rf /')
+    expect(screen.getByText("rm: it is dangerous to operate recursively on '/'")).toBeInTheDocument()
+    expect(screen.getByText('rm: use --no-preserve-root to override this failsafe')).toBeInTheDocument()
+    expect(screen.getByText(/safety check built in/)).toBeInTheDocument()
+  })
+
+  it('rm -rf /* destroys the system, earns Chaos Penguin, and RESET restores it', () => {
+    setReducedMotion(true)
+    renderPage()
+    type('sudo rm -rf /*')
+    expect(screen.getByRole('heading', { name: 'SYSTEM DESTROYED' })).toBeInTheDocument()
+    expect(screen.getByText('SECRET BADGE: CHAOS PENGUIN')).toBeInTheDocument()
+    expect(JSON.parse(localStorage.getItem('plq.progress') ?? '{}').secrets).toEqual({ 'chaos-penguin': true })
+
+    fireEvent.click(screen.getByRole('button', { name: 'RESET' }))
+    type('ls /')
+    expect(screen.getByText(/^bin\s+boot/)).toBeInTheDocument()
+  })
+
+  it('plays the collapse first when motion is allowed', () => {
+    vi.useFakeTimers()
+    setReducedMotion(false)
+    renderPage()
+    type('rm -rf --no-preserve-root /')
+    expect(screen.queryByRole('heading', { name: 'SYSTEM DESTROYED' })).not.toBeInTheDocument()
+    expect(screen.getByText('Uh oh. Uh oh! UH OH!')).toBeInTheDocument()
+    act(() => {
+      vi.advanceTimersByTime(3000)
+    })
+    expect(screen.getByRole('heading', { name: 'SYSTEM DESTROYED' })).toBeInTheDocument()
+  })
+
+  it('the fork bomb freezes the system', () => {
+    setReducedMotion(true)
+    renderPage()
+    type(':(){ :|:& };:')
+    expect(screen.getByRole('heading', { name: 'SYSTEM FROZEN' })).toBeInTheDocument()
+  })
+})

@@ -2,20 +2,22 @@ import { Page } from '../components/Page'
 import { Pip } from '../components/Pip'
 import { ProgressPips } from '../components/ProgressPips'
 import { useProgress } from '../game/ProgressContext'
-import { badges } from '../game/progress'
+import { badges, secretBadges } from '../game/progress'
 import styles from './BadgesPage.module.css'
 
 export function BadgesPage() {
   const { progress } = useProgress()
   const list = badges(progress)
-  const earnedCount = list.filter((b) => b.earned).length
+  const secrets = secretBadges(progress)
+  const earnedCount = list.filter((b) => b.earned).length + secrets.filter((b) => b.earned).length
+  const totalCount = list.length + secrets.length
 
   return (
     <Page>
       <div className={styles.head}>
         <h1 className={styles.title}>BADGES</h1>
         <span className={styles.meta}>
-          {earnedCount} / {list.length} earned
+          {earnedCount} / {totalCount} earned
         </span>
       </div>
 
@@ -51,6 +53,21 @@ export function BadgesPage() {
             </div>
           )
         })}
+        {secrets.map((secret) => (
+          <div
+            key={secret.id}
+            className={`${styles.badge} ${secret.earned ? styles.secretEarned : styles.secretHidden}`}
+          >
+            <div className={`${styles.medal} ${styles.secretMedal}`} aria-hidden="true">
+              {secret.earned ? <Pip size={56} mood="cheer" /> : <span className={styles.mystery}>?</span>}
+            </div>
+            <div className={styles.info}>
+              <span className={styles.worldNum}>SECRET BADGE</span>
+              <h2 className={styles.name}>{secret.earned ? secret.name.toUpperCase() : '???'}</h2>
+              <span className={styles.statusText}>{secret.earned ? secret.how : 'Not found yet.'}</span>
+            </div>
+          </div>
+        ))}
       </div>
     </Page>
   )
