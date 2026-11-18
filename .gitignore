@@ -9,3 +9,8 @@ dist-ssr
 *.log
 logs
 *.tsbuildinfo
+
+# Local secrets and tool settings
+.env
+.env.*
+.claude/settings.local.json

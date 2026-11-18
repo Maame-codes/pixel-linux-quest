@@ -1,0 +1,33 @@
+name: Level idea
+description: Suggest a new level or a change to a world.
+labels: [content, idea]
+body:
+  - type: input
+    id: world
+    attributes:
+      label: Which world?
+      placeholder: e.g. World 3, File Forest
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would the learner learn?
+      description: The commands or ideas, in a sentence or two.
+    validations:
+      required: true
+  - type: dropdown
+    id: test
+    attributes:
+      label: Test type
+      options:
+        - Terminal challenge
+        - Quiz
+        - Not sure
+  - type: textarea
+    id: mission
+    attributes:
+      label: Mission and objectives
+      description: A real-world job for the learner to do, and the steps to complete it.
+      placeholder: |
+        Mission: The website is down. Find the error in the logs.
+        1. Go to /var/log
+        2. ...

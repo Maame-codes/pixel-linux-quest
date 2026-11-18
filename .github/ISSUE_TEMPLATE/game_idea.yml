@@ -1,0 +1,21 @@
+name: Game idea
+description: Suggest a new Break Room game or a change to one.
+labels: [arcade, idea]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: The game
+      description: How does it play, in a few sentences? Games must be original, so please do not base it on a specific existing game.
+    validations:
+      required: true
+  - type: textarea
+    id: controls
+    attributes:
+      label: Controls
+      description: How does it play with a keyboard, and on a phone?
+  - type: textarea
+    id: linux
+    attributes:
+      label: Linux flavour (optional)
+      description: A link to Linux ideas, like Packet Snake's data packets or Bit Breaker's file bricks.

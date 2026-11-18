@@ -1,0 +1,28 @@
+name: Lesson correction
+description: A Linux fact, quiz answer, hint or piece of text that is wrong or unclear.
+labels: [content, correction]
+body:
+  - type: input
+    id: where
+    attributes:
+      label: Where is it?
+      placeholder: e.g. World 1, Level 2, lesson page 3 / quiz question 4 / the intro story
+    validations:
+      required: true
+  - type: textarea
+    id: current
+    attributes:
+      label: What does it say now?
+    validations:
+      required: true
+  - type: textarea
+    id: fix
+    attributes:
+      label: What should it say?
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: How do you know?
+      description: A man page, the output of a command on a real Linux system, or a link to documentation helps a lot.

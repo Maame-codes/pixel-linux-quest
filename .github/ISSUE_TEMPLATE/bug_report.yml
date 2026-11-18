@@ -1,0 +1,35 @@
+name: Bug report
+description: Something in the game is broken or looks wrong.
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you see, and what did you expect to see?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: How can we make it happen again?
+      placeholder: |
+        1. Open World 2, Level 4
+        2. Type mkdir treasure
+        3. ...
+    validations:
+      required: true
+  - type: input
+    id: where
+    attributes:
+      label: Page or level
+      placeholder: e.g. /level/w2-l4-dig-a-folder or the Break Room
+  - type: input
+    id: device
+    attributes:
+      label: Device and browser
+      placeholder: e.g. iPhone 15, Safari / Windows 11, Chrome 131
+  - type: textarea
+    id: extra
+    attributes:
+      label: Screenshots or anything else
