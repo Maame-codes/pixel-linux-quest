@@ -84,6 +84,8 @@ A quiz clears the level at 80% or more correct answers (`src/game/quizScore.ts`)
 - A command registry: each command is its own file returning stdout, stderr and the new state. Commands are unlocked per level.
 - Supports pipes `|` and redirection `>` `>>` once World 5 needs them.
 - Error messages should look like real Linux messages.
+- Command lines are split like bash does it (`src/shell/parse.ts`): quotes, backslash escapes, and `*` / `?` patterns expanded against the filesystem.
+- **Pip explains mistakes.** When a command fails, the terminal still shows the real error, and Pip adds a short, friendly explanation in the speech bubble (`src/shell/explain.ts`, one test per rule). Explanations point at the mistake and never give away the answer to the current objective. Only say a command does not exist on Linux if that is true (`dir` and `type` do exist).
 - Fun easter eggs are welcome (`sudo` and `rm` before they are unlocked give friendly Pip messages).
 - Terminal UI: command history with up/down arrows, Enter runs, a RUN button for touch screens, auto scroll to bottom, `clear` works.
 

@@ -1,8 +1,17 @@
 import { lookupCommand, registry } from './commands'
-import { dir, file, type CommandResult, type DirNode, type ShellState } from './types'
+import { analyzeDanger } from './danger'
+import { parseWords } from './parse'
+import {
+  dir,
+  file,
+  type CommandResult,
+  type DirNode,
+  type ShellEvent,
+  type ShellState,
+} from './types'
 
 /** Commands that always work, even when a level has not unlocked them. */
-const ALWAYS_AVAILABLE = ['help', 'clear']
+const ALWAYS_AVAILABLE = ['help', 'clear', 'type']
 
 /** Friendly Pip messages for powerful commands that unlock later. */
 const EASTER_EGGS: Record<string, string> = {
@@ -11,9 +20,17 @@ const EASTER_EGGS: Record<string, string> = {
   chmod: 'Permissions magic (chmod) is waiting for you in World 3, File Forest.',
 }
 
+const SANDBOX_ONLY =
+  'Whoa, that would wreck a real computer! Save it for the Break It sandbox, where nothing real can break.'
+
 export type RunOptions = {
   /** Command names unlocked for this level. */
   commands: string[]
+  /**
+   * The Break It sandbox: dangerous commands really run and report an event.
+   * Elsewhere they are stopped with a friendly message.
+   */
+  sandbox?: boolean
 }
 
 const DEFAULT_HOME = '/home/pip'
@@ -67,6 +84,7 @@ function result(input: string, state: ShellState, partial: Partial<CommandResult
     stderr: partial.stderr ?? '',
     code: partial.code ?? 0,
     clear: partial.clear ?? false,
+    event: partial.event ?? null,
     state,
   }
 }
@@ -84,18 +102,37 @@ export function runCommand(state: ShellState, input: string, options: RunOptions
     return result(input, next)
   }
 
-  const parts = line.split(/\s+/)
-  const name = parts[0]
-  const args = parts.slice(1)
+  const danger = analyzeDanger(line, state)
+  let event: ShellEvent | null = null
+  if (danger?.kind === 'fork-bomb') {
+    if (!options.sandbox) return result(input, next, { stdout: SANDBOX_ONLY })
+    return result(input, next, { event: 'frozen' })
+  }
+
+  const parsed = parseWords(line, state)
+  if (!parsed.ok) return result(input, next, { stderr: parsed.error, code: 2 })
+  const words = parsed.words
+  if (words.length === 0) return result(input, next)
 
   const unlocked = options.commands
-  const canRun = ALWAYS_AVAILABLE.includes(name) || unlocked.includes(name)
+  const isUnlocked = (name: string) => ALWAYS_AVAILABLE.includes(name) || unlocked.includes(name)
 
-  if (!canRun) {
+  // "sudo COMMAND" runs COMMAND (a real system would ask for a password first).
+  let start = 0
+  while (words[start] === 'sudo' && start + 1 < words.length && isUnlocked('sudo')) start++
+  const name = words[start]
+  const args = words.slice(start + 1)
+
+  if (!isUnlocked(name)) {
     if (name in EASTER_EGGS) {
       return result(input, next, { stdout: EASTER_EGGS[name] })
     }
     return result(input, next, { stderr: `${name}: command not found`, code: 127 })
+  }
+
+  if (danger?.kind === 'wipe') {
+    if (!options.sandbox) return result(input, next, { stdout: SANDBOX_ONLY })
+    event = 'destroyed'
   }
 
   const cmd = registry[name]
@@ -108,6 +145,9 @@ export function runCommand(state: ShellState, input: string, options: RunOptions
     return result(input, next, { stdout: text })
   }
 
+  // Under sudo the command runs as root, then the shell is pip's again.
+  const asRoot = start > 0
+  if (asRoot) next.user = 'root'
   const out = cmd.run({
     args,
     raw: line,
@@ -117,11 +157,13 @@ export function runCommand(state: ShellState, input: string, options: RunOptions
   })
 
   const finalState = out.state ?? next
+  if (asRoot) finalState.user = state.user
   if (out.clear) finalState.history = next.history
   return result(input, finalState, {
     stdout: out.stdout,
     stderr: out.stderr,
     code: out.code,
     clear: out.clear,
+    event,
   })
 }

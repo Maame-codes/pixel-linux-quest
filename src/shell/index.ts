@@ -10,3 +10,7 @@ export {
   type RunOptions,
   type CreateStateOptions,
 } from './engine'
+export { ALL_COMMANDS } from './commands'
+export { tokenize, expandPattern, parseWords, type Token } from './parse'
+export { analyzeDanger, isForkBomb, SYSTEM_DIRS, type Danger } from './danger'
+export { explainMistake, editDistance, COMMAND_WORLDS, WORLD_NAMES, type ExplainOptions } from './explain'

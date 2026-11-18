@@ -5,24 +5,24 @@ import { isDir, isFile, type Command } from '../types'
 export const cat: Command = {
   name: 'cat',
   summary: 'show the contents of a file',
-  usage: 'cat FILE',
-  description: 'Prints the whole contents of a file to the screen.',
+  usage: 'cat FILE...',
+  description: 'Prints the whole contents of one or more files to the screen.',
   run: ({ args, state }) => {
-    const target = args[0]
-    if (!target) {
-      return { stderr: 'cat: missing file operand', code: 1 }
+    // A real cat with no file waits for keyboard input until Ctrl+D. This
+    // terminal cannot wait, so it acts as if Ctrl+D came straight away.
+    if (args.length === 0) return {}
+    const out: string[] = []
+    const err: string[] = []
+    for (const target of args) {
+      const node = getNode(state.fs, resolvePath(state.cwd, target, state.home))
+      if (!node) err.push(`cat: ${target}: No such file or directory`)
+      else if (isDir(node)) err.push(`cat: ${target}: Is a directory`)
+      else if (isFile(node)) out.push(node.content)
     }
-    const abs = resolvePath(state.cwd, target, state.home)
-    const node = getNode(state.fs, abs)
-    if (!node) {
-      return { stderr: `cat: ${target}: No such file or directory`, code: 1 }
+    return {
+      stdout: out.join('\n') || undefined,
+      stderr: err.join('\n') || undefined,
+      code: err.length > 0 ? 1 : 0,
     }
-    if (isDir(node)) {
-      return { stderr: `cat: ${target}: Is a directory`, code: 1 }
-    }
-    if (isFile(node)) {
-      return { stdout: node.content }
-    }
-    return { stdout: '' }
   },
 }

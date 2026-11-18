@@ -17,14 +17,16 @@ export type ShellSessionOptions = {
   seedFs?: DirNode
   startDir?: string
   welcome?: string
+  /** The Break It sandbox: dangerous commands really run. */
+  sandbox?: boolean
 }
 
 export type ShellSession = {
   lines: TerminalLine[]
   state: ShellState
   prompt: string
-  /** Run a command line; returns the result so callers can check objectives. */
-  submit: (input: string) => CommandResult
+  /** Run a command line; returns the result and the state it ran in. */
+  submit: (input: string) => { result: CommandResult; before: ShellState }
   reset: () => void
 }
 
@@ -54,17 +56,18 @@ export function useShellSession(opts: ShellSessionOptions): ShellSession {
   const [lines, setLines] = useState<TerminalLine[]>(() => welcomeLines(opts, nextId))
 
   const commands = opts.commands
+  const sandbox = opts.sandbox ?? false
 
   const submit = useCallback(
-    (input: string): CommandResult => {
+    (input: string): { result: CommandResult; before: ShellState } => {
       const before = stateRef.current
-      const result = runCommand(before, input, { commands })
+      const result = runCommand(before, input, { commands, sandbox })
       stateRef.current = result.state
       setState(result.state)
 
       if (result.clear) {
         setLines([])
-        return result
+        return { result, before }
       }
 
       const added: TerminalLine[] = [
@@ -77,9 +80,9 @@ export function useShellSession(opts: ShellSessionOptions): ShellSession {
         for (const text of result.stderr.split('\n')) added.push({ id: nextId(), text, tone: 'err' })
       }
       setLines((prev) => [...prev, ...added])
-      return result
+      return { result, before }
     },
-    [commands, nextId],
+    [commands, sandbox, nextId],
   )
 
   const reset = useCallback(() => {

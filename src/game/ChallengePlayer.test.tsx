@@ -22,6 +22,7 @@ describe('ChallengePlayer', () => {
       <MemoryRouter>
         <ChallengePlayer
           test={challenge}
+          world={2}
           xp={50}
           clearMessage="Nice work."
           nextHref={null}
@@ -48,6 +49,7 @@ describe('ChallengePlayer', () => {
       <MemoryRouter>
         <ChallengePlayer
           test={challenge}
+          world={2}
           xp={50}
           clearMessage="Nice work."
           nextHref={null}
@@ -69,5 +71,28 @@ describe('ChallengePlayer', () => {
     expect(localStorage.getItem('plq.showMap')).toBe('hidden')
     fireEvent.click(screen.getByRole('button', { name: 'SHOW MAP' }))
     expect(screen.getByRole('region', { name: 'MAP' })).toBeInTheDocument()
+  })
+
+  it('keeps the real error and adds an explanation from Pip', () => {
+    render(
+      <MemoryRouter>
+        <ChallengePlayer
+          test={challenge}
+          world={2}
+          xp={50}
+          clearMessage="Nice work."
+          nextHref={null}
+          onReviewLesson={() => {}}
+          onCompleted={() => {}}
+        />
+      </MemoryRouter>,
+    )
+    type('cd Snacks')
+    expect(screen.getByText('bash: cd: Snacks: No such file or directory')).toBeInTheDocument()
+    expect(
+      screen.getByText('Close! Linux cares about capital letters. You typed Snacks, but the folder is snacks.'),
+    ).toBeInTheDocument()
+    type('ls')
+    expect(screen.queryByText(/Close! Linux cares/)).not.toBeInTheDocument()
   })
 })

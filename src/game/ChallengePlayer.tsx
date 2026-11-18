@@ -4,7 +4,7 @@ import { Panel } from '../components/Panel'
 import { Pip } from '../components/Pip'
 import { PixelButton } from '../components/PixelButton'
 import { QuestList } from '../components/QuestList'
-import { lookupCommand, shortenPath } from '../shell'
+import { explainMistake, lookupCommand, shortenPath } from '../shell'
 import type { ChallengeTest } from '../content/types'
 import { useShellSession } from './useShellSession'
 import { LevelClear } from './LevelClear'
@@ -15,6 +15,8 @@ const WELCOME = 'Welcome to Pip’s pocket terminal. Type help to see what you c
 
 type ChallengePlayerProps = {
   test: ChallengeTest
+  /** The level's world, so Pip can say when a command unlocks. */
+  world: number
   xp: number
   clearMessage: string
   nextHref: string | null
@@ -25,6 +27,7 @@ type ChallengePlayerProps = {
 
 export function ChallengePlayer({
   test,
+  world,
   xp,
   clearMessage,
   nextHref,
@@ -48,12 +51,15 @@ export function ChallengePlayer({
   const [done, setDone] = useState<boolean[]>(doneRef.current)
   const [complete, setComplete] = useState(false)
   const [revealStep, setRevealStep] = useState<number | null>(null)
+  // Pip's note on the last command, if it went wrong.
+  const [mistake, setMistake] = useState<string | null>(null)
 
   const activeIndex = done.findIndex((d) => !d)
   const currentStep = activeIndex === -1 ? objectives.length : activeIndex
 
   function handleSubmit(input: string) {
-    const result = session.submit(input)
+    const { result, before } = session.submit(input)
+    setMistake(explainMistake(input, result, before, { unlocked: test.commands, world }))
     const next = doneRef.current.map(
       (d, i) => d || objectives[i].check(result.state, result),
     )
@@ -73,12 +79,13 @@ export function ChallengePlayer({
     setDone(doneRef.current)
     setComplete(false)
     setRevealStep(null)
+    setMistake(null)
   }
 
   const showAnswer = !complete && revealStep === currentStep
   const pipLine = complete
     ? 'Quest complete. Nice work, explorer!'
-    : objectives[currentStep]?.hint ?? ''
+    : (mistake ?? objectives[currentStep]?.hint ?? '')
   const answer = objectives[currentStep]?.answer ?? ''
 
   const promptTitle = `${session.state.user}@${session.state.host}: ${shortenPath(
@@ -139,7 +146,9 @@ export function ChallengePlayer({
             <div className={styles.hint}>
               <div className={styles.hintText}>
                 <span className={styles.hintLabel}>PIP SAYS</span>
-                <span className={styles.hintBody}>{pipLine}</span>
+                <span className={styles.hintBody} aria-live="polite">
+                  {pipLine}
+                </span>
                 {showAnswer ? <code className={styles.answer}>{answer}</code> : null}
               </div>
               {!complete && answer ? (

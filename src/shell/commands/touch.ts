@@ -5,24 +5,24 @@ import { file, type Command } from '../types'
 export const touch: Command = {
   name: 'touch',
   summary: 'create an empty file',
-  usage: 'touch NAME',
+  usage: 'touch NAME...',
   description:
-    'Creates an empty file with the name you give it. If the file already exists, nothing changes.',
+    'Creates an empty file for each name you give it. If the file already exists, its contents stay the same.',
   run: ({ args, state }) => {
-    const target = args[0]
-    if (!target) {
-      return { stderr: 'touch: missing file operand', code: 1 }
+    if (args.length === 0) {
+      return { stderr: "touch: missing file operand\nTry 'touch --help' for more information.", code: 1 }
     }
-    const abs = resolvePath(state.cwd, target, state.home)
-    const existing = getNode(state.fs, abs)
-    if (existing) {
-      // touch on an existing file/dir is a no-op success here.
-      return { state }
+    const err: string[] = []
+    for (const target of args) {
+      const abs = resolvePath(state.cwd, target, state.home)
+      // touch on something that exists only updates its timestamp.
+      if (getNode(state.fs, abs)) continue
+      if (!getDir(state.fs, dirname(abs))) {
+        err.push(`touch: cannot touch '${target}': No such file or directory`)
+        continue
+      }
+      insertNode(state.fs, abs, file())
     }
-    if (!getDir(state.fs, dirname(abs))) {
-      return { stderr: `touch: cannot touch '${target}': No such file or directory`, code: 1 }
-    }
-    insertNode(state.fs, abs, file())
-    return { state }
+    return { state, stderr: err.join('\n') || undefined, code: err.length > 0 ? 1 : 0 }
   },
 }

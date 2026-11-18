@@ -37,6 +37,7 @@ function LevelRunner({ level }: { level: Level }) {
       ) : level.test.kind === 'challenge' ? (
         <ChallengePlayer
           test={level.test}
+          world={level.world}
           xp={level.xp}
           clearMessage={clearMessage}
           nextHref={nextHref}

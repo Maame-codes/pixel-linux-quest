@@ -63,7 +63,12 @@ export type CommandResult = {
   code: number
   state: ShellState
   clear: boolean
+  /** Set when the command broke the (sandbox) system. */
+  event: ShellEvent | null
 }
+
+/** Something that ends the session: the system was wiped, or frozen by a fork bomb. */
+export type ShellEvent = 'destroyed' | 'frozen'
 
 export const isDir = (node: FsNode | null | undefined): node is DirNode =>
   node != null && node.kind === 'dir'
