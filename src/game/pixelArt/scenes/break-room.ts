@@ -46,7 +46,7 @@ const BUG_ART: SpriteRows = ['..YYY.....', '.YYYYYYYY.', '.YY.RR.YY.', '.YYRRRRY
 const BRICK_ART: SpriteRows = ['OOO.SSS.LL', 'OOO.SSS.LL', 'YY.OOO.SSS', 'YY.OOO.SSS', '..........', '....WWW..B']
 
 function screens(s: SceneBuilder): void {
-  const on = s.layer('screens', 'slow')
+  const on = s.layer('screens', 'blink')
   const off = s.layer('screensAlt', 'blinkLate')
   const arts = [SNAKE_ART, BUG_ART, BRICK_ART]
   const legend = { L: C.lime, H: C.cyan, P: C.yellow, Y: C.yellow, R: C.red, O: C.orange, S: C.sky, W: C.white, B: C.white }

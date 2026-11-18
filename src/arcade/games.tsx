@@ -1,6 +1,7 @@
 import type { ComponentType } from 'react'
 
-import type { GameFrameProps } from './GameFrame'
+import { GameFrame, type GameFrameProps } from './GameFrame'
+import { packetSnake } from './games/packetSnake'
 
 /** What the Break Room passes to a running game. */
 export type PlayProps = Omit<GameFrameProps<unknown>, 'game'>
@@ -19,8 +20,8 @@ export const ARCADE_GAMES: readonly ArcadeGame[] = [
   {
     id: 'packet-snake',
     name: 'Packet Snake',
-    blurb: 'Steer a network cable and gobble data packets.',
-    Play: null,
+    blurb: packetSnake.blurb,
+    Play: (props) => <GameFrame game={packetSnake} {...props} />,
   },
   {
     id: 'bug-smash',
