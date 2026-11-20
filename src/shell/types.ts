@@ -1,7 +1,24 @@
 // Pure data model for the simulated shell. No React in this module.
 
-export type FileNode = { kind: 'file'; content: string }
-export type DirNode = { kind: 'dir'; children: Record<string, FsNode> }
+/**
+ * Owner, group, permission bits and last change time. Seed files may leave
+ * these out: createShellState fills them in (see fillMeta in perm.ts).
+ */
+export type NodeMeta = {
+  /** Permission bits, e.g. 0o644. Includes setuid/setgid/sticky (0o7000) for display. */
+  mode?: number
+  owner?: string
+  group?: string
+  /** Last modification time, in ms since 1970. */
+  mtime?: number
+}
+
+/**
+ * A file. `content` is the text as cat shows it; the file on disk is taken
+ * to end with a newline (unless it is empty), as text files normally do.
+ */
+export type FileNode = { kind: 'file'; content: string } & NodeMeta
+export type DirNode = { kind: 'dir'; children: Record<string, FsNode> } & NodeMeta
 export type FsNode = FileNode | DirNode
 
 export type ShellState = {
@@ -76,8 +93,12 @@ export const isDir = (node: FsNode | null | undefined): node is DirNode =>
 export const isFile = (node: FsNode | null | undefined): node is FileNode =>
   node != null && node.kind === 'file'
 
-/** Authoring helper: make a file node. */
-export const file = (content = ''): FileNode => ({ kind: 'file', content })
+/** Authoring helper: make a file node (owner, group and mode are optional). */
+export const file = (content = '', meta: NodeMeta = {}): FileNode => ({ kind: 'file', content, ...meta })
 
-/** Authoring helper: make a directory node. */
-export const dir = (children: Record<string, FsNode> = {}): DirNode => ({ kind: 'dir', children })
+/** Authoring helper: make a directory node (owner, group and mode are optional). */
+export const dir = (children: Record<string, FsNode> = {}, meta: NodeMeta = {}): DirNode => ({
+  kind: 'dir',
+  children,
+  ...meta,
+})

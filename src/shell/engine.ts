@@ -1,6 +1,7 @@
 import { lookupCommand, registry } from './commands'
 import { analyzeDanger } from './danger'
 import { parseWords } from './parse'
+import { fillMeta } from './perm'
 import {
   dir,
   file,
@@ -64,8 +65,13 @@ export function createShellState(opts: CreateStateOptions = {}): ShellState {
   const cwd = opts.cwd ?? home
   const user = opts.user ?? 'pip'
   const host = opts.host ?? 'island'
+  // Seed files are shared level data, so work on a copy. Anything a seed
+  // did not give an owner, mode or time gets the usual ones.
+  const fs = structuredClone(opts.seedFs ?? defaultFs())
+  const seedTime = Math.floor((Date.now() - 2 * 24 * 60 * 60 * 1000) / 60000) * 60000
+  fillMeta(fs, home, seedTime)
   return {
-    fs: opts.seedFs ?? defaultFs(),
+    fs,
     cwd,
     home,
     user,

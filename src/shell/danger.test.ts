@@ -150,10 +150,18 @@ describe('rm', () => {
       "recursively on '//' (same as '/')",
     )
   })
-  it('rm -rf --no-preserve-root / destroys the system', () => {
-    const r = runCommand(system(), 'rm -rf --no-preserve-root /', SANDBOX)
+  it('sudo rm -rf --no-preserve-root / destroys the system', () => {
+    const r = runCommand(system(), 'sudo rm -rf --no-preserve-root /', SANDBOX)
     expect(r.event).toBe('destroyed')
     expect(Object.keys(r.state.fs.children)).toEqual([])
+  })
+  it('without sudo, it still counts as a wipe, but only pip’s own files go, as on real Linux', () => {
+    const r = runCommand(system(), 'rm -rf --no-preserve-root /', SANDBOX)
+    expect(r.event).toBe('destroyed')
+    expect(r.stderr).toContain("rm: cannot remove '/bin/ls': Permission denied")
+    expect(getNode(r.state.fs, '/bin/ls')).not.toBeNull()
+    expect(getNode(r.state.fs, '/home/pip/notes.txt')).toBeNull()
+    expect(getNode(r.state.fs, '/home/pip')).not.toBeNull()
   })
   it('rm -rf /* destroys the system because the shell expands the *', () => {
     const r = runCommand(system(), 'sudo rm -rf /*', SANDBOX)

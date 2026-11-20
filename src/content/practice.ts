@@ -2,7 +2,7 @@
 // at least two for every command a player can unlock. Each task starts
 // from its own little filesystem, with the player's unlocked commands.
 
-import { dir, file, getNode, isDir, isFile, type DirNode } from '../shell'
+import { dir, file, getNode, isDir, isFile, type DirNode, type ShellState } from '../shell'
 import { namedPath, ran, wordsOf } from './checks'
 import type { Objective } from './types'
 
@@ -17,6 +17,12 @@ export type PracticeTask = Objective & {
 
 const HOME = '/home/pip'
 
+/** A 30 line log, for head, tail and wc. */
+const APP_LOG = Array.from({ length: 30 }, (_, i) => `09:${String(i).padStart(2, '0')} app: step ${i + 1} ok`).join('\n')
+const LOG_LINES = APP_LOG.split('\n')
+
+const modeOf = (s: ShellState, path: string) => getNode(s.fs, path)?.mode ?? 0
+
 /** A small home for practice, plus a few system folders to visit. */
 function practiceFs(): DirNode {
   return dir({
@@ -27,11 +33,22 @@ function practiceFs(): DirNode {
     home: dir({
       pip: dir({
         'fish.txt': file('><> salmon\n><> cod\n><> herring'),
-        docs: dir({ 'guide.txt': file('Step 1: breathe. Step 2: type.') }),
+        'app.log': file(APP_LOG),
+        'config.txt': file('colour=blue\nsound=off'),
+        'junk.tmp': file(''),
+        'script.sh': file('#!/bin/bash\necho "Hi from Pip"'),
+        'secret.txt': file('Pip loves sardines.'),
+        docs: dir({
+          'guide.txt': file('Step 1: breathe. Step 2: type.'),
+          howto: dir({ 'steps.txt': file('1. look 2. think 3. type') }),
+        }),
+        forest: dir({ oak: dir({ nest: dir({ 'egg.txt': file('a small blue egg') }) }), pine: dir() }),
         games: dir({ 'scores.txt': file('snake 120') }),
-        photos: dir({ '2024': dir({ 'beach.png': file('(a picture)') }) }),
-        projects: dir({ 'plan.txt': file('Build an igloo.') }),
+        old: dir(),
+        photos: dir({ '2024': dir({ 'beach.png': file('(a picture)') }), '2025': dir() }),
+        projects: dir({ 'plan.txt': file('Build an igloo.'), drafts: dir() }),
         snacks: dir({ 'krill.txt': file('crunchy') }),
+        trash: dir({ 'a.tmp': file('a'), 'b.tmp': file('b') }),
       }),
     }),
     var: dir({ log: dir({ 'syslog': file('all quiet') }) }),
@@ -147,12 +164,12 @@ export const PRACTICE_TASKS: PracticeTask[] = [
   {
     id: 'mkdir-2',
     command: 'mkdir',
-    label: 'Make a folder called drafts inside projects, without moving',
+    label: 'Make a folder called ideas inside projects, without moving',
     hint: 'You can give mkdir a path: the parent folder, a slash, then the new name.',
-    answer: 'mkdir projects/drafts',
+    answer: 'mkdir projects/ideas',
     seedFs: practiceFs,
     startDir: HOME,
-    check: (s) => isDir(getNode(s.fs, `${HOME}/projects/drafts`)),
+    check: (s) => isDir(getNode(s.fs, `${HOME}/projects/ideas`)),
   },
   // touch
   {
@@ -259,6 +276,222 @@ export const PRACTICE_TASKS: PracticeTask[] = [
     startDir: HOME,
     preRun: ['ls', 'cd docs', 'cat guide.txt', 'cd ..'],
     check: (_s, last) => ran(last, 'history'),
+  },
+  // cp
+  {
+    id: 'cp-1',
+    command: 'cp',
+    label: 'Back up config.txt as config.bak before changing it',
+    hint: 'cp, then the file to copy, then the name of the copy.',
+    answer: 'cp config.txt config.bak',
+    seedFs: practiceFs,
+    startDir: HOME,
+    check: (s) => {
+      const bak = getNode(s.fs, `${HOME}/config.bak`)
+      return isFile(bak) && bak.content.startsWith('colour=blue') && isFile(getNode(s.fs, `${HOME}/config.txt`))
+    },
+  },
+  {
+    id: 'cp-2',
+    command: 'cp',
+    label: 'Copy the whole projects folder to a new folder called projects-copy',
+    hint: 'Copying a folder needs one extra option, for "recursive".',
+    answer: 'cp -r projects projects-copy',
+    seedFs: practiceFs,
+    startDir: HOME,
+    check: (s) => isFile(getNode(s.fs, `${HOME}/projects-copy/plan.txt`)),
+  },
+  {
+    id: 'cp-3',
+    command: 'cp',
+    label: 'Put a copy of fish.txt in the docs folder',
+    hint: 'If the last name is a folder, cp puts the copy inside it.',
+    answer: 'cp fish.txt docs',
+    seedFs: practiceFs,
+    startDir: HOME,
+    check: (s) => isFile(getNode(s.fs, `${HOME}/docs/fish.txt`)) && isFile(getNode(s.fs, `${HOME}/fish.txt`)),
+  },
+  // mv
+  {
+    id: 'mv-1',
+    command: 'mv',
+    label: 'Rename config.txt to settings.txt',
+    hint: 'Moving a file to a new name in the same folder renames it.',
+    answer: 'mv config.txt settings.txt',
+    seedFs: practiceFs,
+    startDir: HOME,
+    check: (s, last) =>
+      ran(last, 'mv') && isFile(getNode(s.fs, `${HOME}/settings.txt`)) && !getNode(s.fs, `${HOME}/config.txt`),
+  },
+  {
+    id: 'mv-2',
+    command: 'mv',
+    label: 'Move fish.txt into the snacks folder',
+    hint: 'mv, the file, then the folder it should go into.',
+    answer: 'mv fish.txt snacks',
+    seedFs: practiceFs,
+    startDir: HOME,
+    check: (s, last) =>
+      ran(last, 'mv') && isFile(getNode(s.fs, `${HOME}/snacks/fish.txt`)) && !getNode(s.fs, `${HOME}/fish.txt`),
+  },
+  // rm
+  {
+    id: 'rm-1',
+    command: 'rm',
+    label: 'Delete the empty file junk.tmp',
+    hint: 'rm deletes files. There is no recycle bin, so check the name first.',
+    answer: 'rm junk.tmp',
+    seedFs: practiceFs,
+    startDir: HOME,
+    check: (s) => getNode(s.fs, `${HOME}/junk.tmp`) === null && isFile(getNode(s.fs, `${HOME}/fish.txt`)),
+  },
+  {
+    id: 'rm-2',
+    command: 'rm',
+    label: 'Delete the trash folder and everything in it',
+    hint: 'rm deletes a folder only with the option for "recursive".',
+    answer: 'rm -r trash',
+    seedFs: practiceFs,
+    startDir: HOME,
+    check: (s) => getNode(s.fs, `${HOME}/trash`) === null && isDir(getNode(s.fs, `${HOME}/docs`)),
+  },
+  // rmdir
+  {
+    id: 'rmdir-1',
+    command: 'rmdir',
+    label: 'Remove the empty folder called old, with the command that only removes empty folders',
+    hint: 'This command is rm plus three letters for "directory".',
+    answer: 'rmdir old',
+    seedFs: practiceFs,
+    startDir: HOME,
+    check: (s, last) => ran(last, 'rmdir') && getNode(s.fs, `${HOME}/old`) === null,
+  },
+  {
+    id: 'rmdir-2',
+    command: 'rmdir',
+    label: 'Remove the empty drafts folder inside projects, without moving',
+    hint: 'Give rmdir the path: the parent folder, a slash, then the folder name.',
+    answer: 'rmdir projects/drafts',
+    seedFs: practiceFs,
+    startDir: HOME,
+    check: (s, last) => ran(last, 'rmdir') && getNode(s.fs, `${HOME}/projects/drafts`) === null,
+  },
+  // head
+  {
+    id: 'head-1',
+    command: 'head',
+    label: 'Show only the first 3 lines of app.log',
+    hint: 'head shows the start of a file. -n says how many lines.',
+    answer: 'head -n 3 app.log',
+    seedFs: practiceFs,
+    startDir: HOME,
+    check: (_s, last) => ran(last, 'head') && last.stdout === LOG_LINES.slice(0, 3).join('\n'),
+  },
+  {
+    id: 'head-2',
+    command: 'head',
+    label: 'Show the first 10 lines of app.log',
+    hint: 'With no -n, head shows 10 lines.',
+    answer: 'head app.log',
+    seedFs: practiceFs,
+    startDir: HOME,
+    check: (_s, last) => ran(last, 'head') && last.stdout === LOG_LINES.slice(0, 10).join('\n'),
+  },
+  // tail
+  {
+    id: 'tail-1',
+    command: 'tail',
+    label: 'Show the last 5 lines of app.log',
+    hint: 'tail shows the end of a file. -n says how many lines.',
+    answer: 'tail -n 5 app.log',
+    seedFs: practiceFs,
+    startDir: HOME,
+    check: (_s, last) => ran(last, 'tail') && last.stdout === LOG_LINES.slice(-5).join('\n'),
+  },
+  {
+    id: 'tail-2',
+    command: 'tail',
+    label: 'Show just the newest line of app.log (the very last one)',
+    hint: 'Logs grow at the end. Ask tail for 1 line.',
+    answer: 'tail -n 1 app.log',
+    seedFs: practiceFs,
+    startDir: HOME,
+    check: (_s, last) => ran(last, 'tail') && last.stdout === LOG_LINES[LOG_LINES.length - 1],
+  },
+  // wc
+  {
+    id: 'wc-1',
+    command: 'wc',
+    label: 'Count how many lines app.log has',
+    hint: 'wc counts. Its -l option counts lines.',
+    answer: 'wc -l app.log',
+    seedFs: practiceFs,
+    startDir: HOME,
+    check: (_s, last) => ran(last, 'wc') && /^\s*30\b/.test(last.stdout),
+  },
+  {
+    id: 'wc-2',
+    command: 'wc',
+    label: 'Count the words in fish.txt',
+    hint: 'wc counts. Its -w option counts words.',
+    answer: 'wc -w fish.txt',
+    seedFs: practiceFs,
+    startDir: HOME,
+    check: (_s, last) => ran(last, 'wc') && /^\s*6 fish\.txt$/.test(last.stdout),
+  },
+  // find
+  {
+    id: 'find-1',
+    command: 'find',
+    label: 'Find egg.txt, hidden somewhere inside the forest folder',
+    hint: 'find, the folder to search, then -name and the file name.',
+    answer: 'find forest -name egg.txt',
+    seedFs: practiceFs,
+    startDir: HOME,
+    check: (_s, last) => ran(last, 'find') && last.stdout.split('\n').some((l) => l.endsWith('nest/egg.txt')),
+  },
+  {
+    id: 'find-2',
+    command: 'find',
+    label: 'Find every .txt file inside docs, however deep',
+    hint: "A * pattern matches any name. Put the pattern in quotes, like '*.txt'.",
+    answer: "find docs -name '*.txt'",
+    seedFs: practiceFs,
+    startDir: HOME,
+    check: (_s, last) =>
+      ran(last, 'find') && last.stdout.includes('guide.txt') && last.stdout.includes('howto/steps.txt'),
+  },
+  {
+    id: 'find-3',
+    command: 'find',
+    label: 'List only the folders inside photos',
+    hint: 'find has a -type test: f for files, d for folders.',
+    answer: 'find photos -type d',
+    seedFs: practiceFs,
+    startDir: HOME,
+    check: (_s, last) =>
+      ran(last, 'find') && last.stdout.includes('photos/2025') && !last.stdout.includes('beach.png'),
+  },
+  // chmod
+  {
+    id: 'chmod-1',
+    command: 'chmod',
+    label: 'Make script.sh runnable for you, its owner',
+    hint: 'chmod with u (you, the owner), + and x (execute).',
+    answer: 'chmod u+x script.sh',
+    seedFs: practiceFs,
+    startDir: HOME,
+    check: (s) => (modeOf(s, `${HOME}/script.sh`) & 0o100) !== 0,
+  },
+  {
+    id: 'chmod-2',
+    command: 'chmod',
+    label: 'Lock secret.txt so only you can read and write it',
+    hint: 'In numbers: 6 is read plus write, 0 is nothing. Owner, then group, then others.',
+    answer: 'chmod 600 secret.txt',
+    seedFs: practiceFs,
+    startDir: HOME,
+    check: (s) => (modeOf(s, `${HOME}/secret.txt`) & 0o777) === 0o600,
   },
 ]
 

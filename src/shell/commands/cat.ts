@@ -1,6 +1,7 @@
-import { getNode } from '../fs'
+import { readText } from '../io'
 import { resolvePath } from '../path'
-import { isDir, isFile, type Command } from '../types'
+import { ERRNO_TEXT } from '../perm'
+import type { Command } from '../types'
 
 export const cat: Command = {
   name: 'cat',
@@ -14,10 +15,9 @@ export const cat: Command = {
     const out: string[] = []
     const err: string[] = []
     for (const target of args) {
-      const node = getNode(state.fs, resolvePath(state.cwd, target, state.home))
-      if (!node) err.push(`cat: ${target}: No such file or directory`)
-      else if (isDir(node)) err.push(`cat: ${target}: Is a directory`)
-      else if (isFile(node)) out.push(node.content)
+      const read = readText(state, resolvePath(state.cwd, target, state.home))
+      if (read.ok) out.push(read.content.replace(/\n$/, ''))
+      else err.push(`cat: ${target}: ${ERRNO_TEXT[read.errno]}`)
     }
     return {
       stdout: out.join('\n') || undefined,

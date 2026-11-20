@@ -117,8 +117,10 @@ A quiz clears the level at 80% or more correct answers (`src/game/quizScore.ts`)
 - Error messages should look like real Linux messages.
 - Command lines are split like bash does it (`src/shell/parse.ts`): quotes, backslash escapes, and `*` / `?` patterns expanded against the filesystem.
 - **Pip explains mistakes.** When a command fails, the terminal still shows the real error, and Pip adds a short, friendly explanation in the speech bubble (`src/shell/explain.ts`, one test per rule). Explanations point at the mistake and never give away the answer to the current objective. Only say a command does not exist on Linux if that is true (`dir` and `type` do exist).
-- `rm` is implemented (`-r`, `-f`, `-d`, `-v`, `--no-preserve-root`) with GNU error messages, but stays locked in levels until World 3. `sudo COMMAND` runs the command as root. `type` and `dir` exist because they exist on real Linux.
-- Fun easter eggs are welcome (`sudo` and `rm` before they are unlocked give friendly Pip messages).
+- `rm` is implemented (`-r`, `-f`, `-d`, `-v`, `--no-preserve-root`) with GNU error messages, but stays locked in levels until World 3. Without `-f`, `rm` on a file the user cannot write prints GNU's "remove write-protected regular file" question and keeps the file, because the terminal cannot answer questions. `sudo COMMAND` runs the command as root. `type` and `dir` exist because they exist on real Linux.
+- **World 3 commands** (each its own file, unit tested in `src/shell/world3.test.ts`): `cp` (`-r`, `-v`, into a directory), `mv` (`-v`), `rmdir` (`-p`, `-v`), `head` and `tail` (`-n N`, `-nN`, `-N`, `--lines`, `tail -n +N`, `head -n -N`, default 10, `==> name <==` headers), `wc` (`-l`, `-w`, `-c`, GNU column widths and `total`), `find` (`PATH`, `-name`, `-iname`, `-type f|d`), `chmod` (numeric and symbolic modes, `-R`, `-v`), and `ls -l`, `-a`, `-A`, `-d`. Options are read GNU style by `src/shell/options.ts`. `less` is deliberately not implemented: typing it gives `less: command not found`, and Pip explains what it does and suggests `head` or `tail`.
+- **Files and permissions** (`src/shell/perm.ts`). Every node has an owner, a group, a mode and a time. Seeds may leave them out: `createShellState` copies the seed and fills in pip:pip for anything under `/home/pip` and root:root elsewhere, mode 644 for files and 755 for directories (umask 022). New files and copies belong to whoever made them (root under sudo). The kernel rules are enforced for the user pip: r to read a file or list a directory, w on a file to change it, w and x on a directory to add, delete or rename in it, x on every directory on the way (`lookup`), the sticky bit in `/tmp`, and only the owner may `chmod`. root (sudo, sandbox only) bypasses them. A file's text is taken to end with a newline, so sizes and `wc` match a real text file.
+- Fun easter eggs are welcome (`sudo`, `rm` and `chmod` before they are unlocked give friendly Pip messages).
 - Terminal UI: command history with up/down arrows, Enter runs, a RUN button for touch screens, auto scroll to bottom, `clear` works.
 
 ## Intro story outline
@@ -139,9 +141,9 @@ Topic order is inspired by the free Introduction to Linux (LFS101) course, but e
 
 - **World 1, Penguin Island:** Linux philosophy and key ideas (quiz), distro families (quiz), how a system boots (quiz or put-in-order game).
 - **World 2, Command Caves:** first commands (`pwd`, `ls`, `whoami`), moving around (`cd`, absolute vs relative paths), dig a folder (`mkdir`, `touch`), getting help (`man`, `--help`), history and shortcuts.
-- **World 3, File Forest:** `cp`, `mv`, `rm`, viewing files (`cat`, `head`, `tail`, `less`), finding files (`find`), permissions (`ls -l`, `chmod`).
+- **World 3, File Forest:** `cp`, `mv`, `rm`, `rmdir`, viewing files (`cat`, `head`, `tail`, `wc -l`; `less` is explained but not in the terminal), finding files (`find`), permissions (`ls -l`, `chmod`).
 - **World 4, Process Peaks:** processes (`ps`, `kill`, jobs), the user environment (variables, `PATH`, `alias`), a gentle look at `nano`.
-- **World 5, Text Tundra:** redirection, `grep`, pipes, `sort`, `uniq`, `wc`, `cut`.
+- **World 5, Text Tundra:** redirection, `grep`, pipes, `sort`, `uniq`, more `wc`, `cut`.
 - **World 6, Script Castle:** first Bash script, variables, if and loops, networking basics (`ping`, `ip`, simulated output), local security (users, root, `sudo`). Final boss level mixes everything.
 - **Side quests (optional quizzes):** desktop environments, common applications, printing.
 

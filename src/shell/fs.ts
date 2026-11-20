@@ -37,3 +37,30 @@ export function insertNode(root: DirNode, absPath: string, node: FsNode): boolea
   parent.children[basename(absPath)] = node
   return true
 }
+
+/** Join a directory path and a name ("/" + "a" -> "/a", "/x" + "a" -> "/x/a"). */
+export function joinPath(dirPath: string, name: string): string {
+  return dirPath === '/' ? `/${name}` : `${dirPath}/${name}`
+}
+
+/** Join what the user typed and a name, the way GNU tools show it ("dir/" + "a" -> "dir/a"). */
+export function joinShown(typed: string, name: string): string {
+  return typed.endsWith('/') ? `${typed}${name}` : `${typed}/${name}`
+}
+
+/**
+ * The lines of a text file, without the newline at the end. A file's text
+ * is taken to end with a newline (as text files normally do), so "a\nb"
+ * and "a\nb\n" are both two lines. An empty file has none.
+ */
+export function fileLines(content: string): string[] {
+  if (content === '') return []
+  return content.replace(/\n$/, '').split('\n')
+}
+
+/** The size of a file in bytes (UTF-8), counting the newline at the end. */
+export function fileBytes(content: string): number {
+  if (content === '') return 0
+  const bytes = new TextEncoder().encode(content).length
+  return content.endsWith('\n') ? bytes : bytes + 1
+}
