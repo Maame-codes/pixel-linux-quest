@@ -140,8 +140,55 @@ export function sceneFrozen(): PixelScene {
   )
 }
 
+const EMPTY_FOLDER: SpriteRows = [
+  'KKKKK.........',
+  'KTTTTK........',
+  'KFFFFFFFFFFFFK',
+  'KF..........FK',
+  'KF..........FK',
+  'KF..........FK',
+  'KF..........FK',
+  'KFFFFFFFFFFFFK',
+  'KKKKKKKKKKKKKK',
+]
+const CHECK: readonly (readonly [number, number])[] = [
+  [34, 19], [35, 20], [36, 21], [37, 22], [38, 21], [39, 20], [40, 19], [41, 18], [42, 17], [43, 16], [44, 15],
+]
+
+/** rm -rf / without sudo: Linux is fine, but pip's own folder is empty. */
+export function sceneHomeWiped(): PixelScene {
+  const s = new SceneBuilder()
+  const cv = s.base
+
+  // A calm room: the computer still works.
+  cv.rect(0, 0, W, H, C.bg)
+  for (let y = 0; y < 56; y += 6) cv.rect(0, y, W, 1, C.wallLine)
+  cv.rect(0, 56, W, H - 56, C.panel).rect(0, 56, W, 1, C.slate)
+  for (let x = 4; x < W; x += 16) cv.rect(x, 60, 8, 1, C.wallLine).rect(x + 8, 66, 8, 1, C.wallLine)
+
+  desk(cv, C.wood, C.woodDark)
+  monitor(cv, 22, 10, C.deep)
+
+  // A big green tick on the screen: the system survived.
+  for (const [cx, cy] of CHECK) cv.rect(cx, cy, 2, 2, C.lime)
+  s.layer('cursor', 'blink').rect(52, 29, 3, 1, C.lime)
+
+  // Pip's home folder, open and empty, on the floor.
+  cv.sprite(84, 58, EMPTY_FOLDER, BLUE_FOLDER)
+  s.layer('dust', 'slow').pix(89, 61, C.slate).pix(92, 63, C.slate).pix(94, 60, C.slate)
+
+  // Pip, puzzled, with a question mark.
+  s.pip(104, 41)
+  drawText(cv, 114, 30, '?', C.yellow)
+
+  return s.build(
+    'A computer that still works, with a green tick on its screen. On the floor, Pip looks puzzled at an empty home folder.',
+  )
+}
+
 /** Crash scenes keyed by id, drawn with the same renderer as the intro. */
 export const CRASH_SCENES: Readonly<Record<string, () => PixelScene>> = {
   destroyed: sceneDestroyed,
   frozen: sceneFrozen,
+  'home-wiped': sceneHomeWiped,
 }

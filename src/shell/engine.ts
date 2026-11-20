@@ -143,7 +143,10 @@ export function runCommand(state: ShellState, input: string, options: RunOptions
 
   if (danger?.kind === 'wipe') {
     if (!options.sandbox) return result(input, next, { stdout: SANDBOX_ONLY })
-    event = 'destroyed'
+    // With sudo, rm runs as root and nothing is protected. Without it, the
+    // permissions keep the system files safe and only pip's own files go.
+    if (danger.sudo && isUnlocked('sudo')) event = 'destroyed'
+    else if (danger.coversHome) event = 'home-wiped'
   }
 
   const cmd = registry[name]

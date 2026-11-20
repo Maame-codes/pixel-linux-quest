@@ -1,23 +1,38 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { PixelButton } from '../components/PixelButton'
+import { SpeechBubble } from '../components/SpeechBubble'
 import type { ShellEvent } from '../shell'
 import { IntroArt } from './IntroArt'
-import { browserShareEnv, crashShareText, shareOrCopy } from './share'
+import { browserShareEnv, crashShareText, shareOrCopy, type SystemBreak } from './share'
 import styles from './CrashScreen.module.css'
+
+/** For HOME FOLDER WIPED: what was deleted and what permissions saved. */
+export type WipeStats = {
+  /** Files and folders of pip's that rm deleted. */
+  deleted: number
+  /** "Permission denied" lines: system files that permissions protected. */
+  protectedCount: number
+}
 
 type CrashScreenProps = {
   kind: ShellEvent
   /** The command line that did it. */
   command: string
-  /** Whether it was run with sudo. */
-  sudo: boolean
   /** True the first time: the Chaos Penguin badge was just earned. */
   newBadge: boolean
+  /** Only for kind "home-wiped". */
+  stats?: WipeStats
   onReset: () => void
 }
 
-function explanation(kind: ShellEvent, sudo: boolean): string[] {
+const TITLES: Record<ShellEvent, string> = {
+  destroyed: 'SYSTEM DESTROYED',
+  frozen: 'SYSTEM FROZEN',
+  'home-wiped': 'HOME FOLDER WIPED',
+}
+
+function explanation(kind: ShellEvent): string[] {
   if (kind === 'frozen') {
     return [
       'This line is a fork bomb: a tiny function that starts two copies of itself, and every copy starts two more.',
@@ -25,17 +40,17 @@ function explanation(kind: ShellEvent, sudo: boolean): string[] {
       'Many Linux systems limit how many processes one user can run, which can stop it.',
     ]
   }
-  if (sudo) {
+  if (kind === 'home-wiped') {
     return [
-      'With sudo, nothing stops rm -rf: it deletes the programs Linux runs on, its settings and every file on the disk.',
-      'A real computer would not start again until Linux was reinstalled.',
-      'rm has no recycle bin, so there is no easy way to get the files back.',
+      'Linux survived! The system files belong to root, and your user, pip, has no permission to delete them. That is what all those "Permission denied" lines were: permissions protecting the system.',
+      'Your own files had no such protection, because you own them. Everything you could delete in your home folder is gone, and rm has no recycle bin.',
+      'Put sudo in front and rm runs as root, which ignores permissions. That is what makes this command destroy everything.',
     ]
   }
   return [
-    'On a real computer, Linux would block most of this with "Permission denied", but rm -rf would still delete every file you own.',
-    'With sudo in front, it deletes everything, and the computer would not start again until Linux was reinstalled.',
-    'rm has no recycle bin, so there is no easy way to get files back.',
+    'With sudo, nothing stops rm -rf: it deletes the programs Linux runs on, its settings and every file on the disk.',
+    'A real computer would not start again until Linux was reinstalled.',
+    'rm has no recycle bin, so there is no easy way to get the files back.',
   ]
 }
 
@@ -45,7 +60,7 @@ const SHARE_MESSAGES = {
 } as const
 
 /** SHARE: the share sheet on phones, the clipboard everywhere else. */
-function ShareButton({ command, kind }: { command: string; kind: ShellEvent }) {
+function ShareButton({ command, kind }: { command: string; kind: SystemBreak }) {
   const [message, setMessage] = useState<keyof typeof SHARE_MESSAGES | null>(null)
   useEffect(() => {
     if (!message) return
@@ -70,18 +85,26 @@ function ShareButton({ command, kind }: { command: string; kind: ShellEvent }) {
   )
 }
 
-/** The shareable "you broke it" screen, with a RESET button. */
-export function CrashScreen({ kind, command, sudo, newBadge, onReset }: CrashScreenProps) {
+const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`
+
+/**
+ * The screen after the sandbox breaks: the shareable SYSTEM DESTROYED and
+ * SYSTEM FROZEN, or the lighter HOME FOLDER WIPED, each with RESET.
+ */
+export function CrashScreen({ kind, command, newBadge, stats, onReset }: CrashScreenProps) {
   const headingRef = useRef<HTMLHeadingElement>(null)
   useEffect(() => {
     headingRef.current?.focus()
   }, [])
 
-  const frozen = kind === 'frozen'
+  const tone = kind === 'frozen' ? styles.frozen : kind === 'home-wiped' ? styles.homeWiped : styles.destroyed
+  const home = kind === 'home-wiped'
+  const text = explanation(kind)
+
   return (
-    <section className={`${styles.screen} ${frozen ? styles.frozen : styles.destroyed}`} aria-labelledby="crash-title">
+    <section className={`${styles.screen} ${tone}`} aria-labelledby="crash-title">
       <h1 id="crash-title" ref={headingRef} tabIndex={-1} className={styles.title}>
-        {frozen ? 'SYSTEM FROZEN' : 'SYSTEM DESTROYED'}
+        {TITLES[kind]}
       </h1>
 
       <div className={styles.art}>
@@ -92,13 +115,30 @@ export function CrashScreen({ kind, command, sudo, newBadge, onReset }: CrashScr
         <span className={styles.prompt}>pip@island:~$</span> {command}
       </p>
 
-      <div className={styles.body}>
-        {explanation(kind, sudo).map((text) => (
-          <p key={text}>{text}</p>
-        ))}
-      </div>
+      {home && stats ? (
+        <p className={styles.stats}>
+          {plural(stats.deleted, 'file or folder of yours', 'of your files and folders')} deleted.{' '}
+          {plural(stats.protectedCount, 'system file', 'system files')} protected by permissions.
+        </p>
+      ) : null}
 
-      {newBadge ? (
+      {home ? (
+        <SpeechBubble label="PIP SAYS" className={styles.bubble}>
+          {text.map((t) => (
+            <p key={t} className={styles.bubbleText}>
+              {t}
+            </p>
+          ))}
+        </SpeechBubble>
+      ) : (
+        <div className={styles.body}>
+          {text.map((t) => (
+            <p key={t}>{t}</p>
+          ))}
+        </div>
+      )}
+
+      {newBadge && !home ? (
         <p className={styles.badge} role="status">
           SECRET BADGE: CHAOS PENGUIN
         </p>
@@ -106,10 +146,14 @@ export function CrashScreen({ kind, command, sudo, newBadge, onReset }: CrashScr
 
       <div className={styles.actions}>
         <PixelButton onClick={onReset}>RESET</PixelButton>
-        <PixelButton to="/badges" variant="secondary">
-          BADGES
-        </PixelButton>
-        <ShareButton command={command} kind={kind} />
+        {kind === 'home-wiped' ? null : (
+          <>
+            <PixelButton to="/badges" variant="secondary">
+              BADGES
+            </PixelButton>
+            <ShareButton command={command} kind={kind} />
+          </>
+        )}
       </div>
 
       <p className={styles.credit}>PIXEL LINUX QUEST · BREAK IT SANDBOX</p>

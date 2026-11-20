@@ -130,3 +130,35 @@
   line-height: 1.5;
   color: var(--lime);
 }
+
+/* HOME FOLDER WIPED: lighter than a broken system. Linux survived. */
+.homeWiped {
+  background: var(--panel);
+  border-color: var(--yellow);
+  box-shadow: 8px 8px 0 var(--panel-2);
+}
+
+.homeWiped .title {
+  color: var(--yellow);
+  text-shadow: 4px 4px 0 var(--deep);
+}
+
+.stats {
+  margin: 0;
+  font-size: 20px;
+  line-height: 1.5;
+  color: var(--lime);
+}
+
+.bubble {
+  max-width: 620px;
+  text-align: left;
+}
+
+.bubbleText {
+  margin: 0 0 var(--space-3);
+}
+
+.bubbleText:last-child {
+  margin-bottom: 0;
+}

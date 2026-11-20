@@ -81,13 +81,46 @@ describe('SandboxPage', () => {
     vi.useFakeTimers()
     setReducedMotion(false)
     renderPage()
-    type('rm -rf --no-preserve-root /')
+    type('sudo rm -rf --no-preserve-root /')
     expect(screen.queryByRole('heading', { name: 'SYSTEM DESTROYED' })).not.toBeInTheDocument()
     expect(screen.getByText('Uh oh. Uh oh! UH OH!')).toBeInTheDocument()
     act(() => {
       vi.advanceTimersByTime(3000)
     })
     expect(screen.getByRole('heading', { name: 'SYSTEM DESTROYED' })).toBeInTheDocument()
+  })
+
+  it.each(['rm -rf --no-preserve-root /', 'rm -rf /*'])(
+    'without sudo, %s only wipes the home folder: Linux survives, no badge',
+    (line) => {
+      setReducedMotion(true)
+      renderPage()
+      type(line)
+      expect(screen.getByRole('heading', { name: 'HOME FOLDER WIPED' })).toBeInTheDocument()
+      expect(screen.queryByRole('heading', { name: 'SYSTEM DESTROYED' })).not.toBeInTheDocument()
+      expect(screen.getByText(/system files protected by permissions/)).toBeInTheDocument()
+      expect(screen.getByText(/That is what makes this command destroy everything/)).toBeInTheDocument()
+      expect(screen.queryByText('SECRET BADGE: CHAOS PENGUIN')).not.toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'SHARE' })).not.toBeInTheDocument()
+      expect(JSON.parse(localStorage.getItem('plq.progress') ?? '{}').secrets ?? {}).toEqual({})
+
+      fireEvent.click(screen.getByRole('button', { name: 'RESET' }))
+      type('cat notes.txt')
+      expect(screen.getByText('Things to try in the sandbox:')).toBeInTheDocument()
+    },
+  )
+
+  it('without sudo, the real Permission denied lines show before the HOME FOLDER WIPED screen', () => {
+    vi.useFakeTimers()
+    setReducedMotion(false)
+    renderPage()
+    type('rm -rf /*')
+    expect(screen.getByText("rm: cannot remove '/bin/bash': Permission denied")).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'HOME FOLDER WIPED' })).not.toBeInTheDocument()
+    act(() => {
+      vi.advanceTimersByTime(3000)
+    })
+    expect(screen.getByRole('heading', { name: 'HOME FOLDER WIPED' })).toBeInTheDocument()
   })
 
   it('the fork bomb freezes the system', () => {

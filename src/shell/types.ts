@@ -84,8 +84,11 @@ export type CommandResult = {
   event: ShellEvent | null
 }
 
-/** Something that ends the session: the system was wiped, or frozen by a fork bomb. */
-export type ShellEvent = 'destroyed' | 'frozen'
+/**
+ * Something that ends the session: the system was wiped (with sudo), frozen
+ * by a fork bomb, or (without sudo) only pip's own files were deleted.
+ */
+export type ShellEvent = 'destroyed' | 'frozen' | 'home-wiped'
 
 export const isDir = (node: FsNode | null | undefined): node is DirNode =>
   node != null && node.kind === 'dir'

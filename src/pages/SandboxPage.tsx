@@ -4,7 +4,7 @@ import { Page } from '../components/Page'
 import { Pip } from '../components/Pip'
 import { PixelButton } from '../components/PixelButton'
 import { sandboxFs } from '../content/sandbox'
-import { CrashScreen } from '../game/CrashScreen'
+import { CrashScreen, type WipeStats } from '../game/CrashScreen'
 import type { FolderMapOptions } from '../game/folderMapModel'
 import { useProgress } from '../game/ProgressContext'
 import { TerminalWithMap } from '../game/TerminalWithMap'
@@ -12,8 +12,9 @@ import { useShellSession } from '../game/useShellSession'
 import { withSudoTip } from '../game/sudoTip'
 import {
   ALL_COMMANDS,
-  analyzeDanger,
   explainMistake,
+  isDir,
+  type FsNode,
   shortenPath,
   type ShellEvent,
   type ShellState,
@@ -36,11 +37,17 @@ const FORK_ERROR = 'bash: fork: retry: Resource temporarily unavailable'
 type Crash = {
   kind: ShellEvent
   command: string
-  sudo: boolean
   newBadge: boolean
+  /** HOME FOLDER WIPED: what went and what permissions protected. */
+  stats?: WipeStats
   stage: 'falling' | 'screen'
   /** The system just before it broke, so the map has something to tumble. */
   before: ShellState
+}
+
+/** Every file and folder in a tree (to count what rm deleted). */
+function countNodes(node: FsNode): number {
+  return isDir(node) ? Object.values(node.children).reduce((n, c) => n + countNodes(c), 1) : 1
 }
 
 function prefersReducedMotion(): boolean {
@@ -74,22 +81,34 @@ export function SandboxPage() {
     if (crash) return
     const { result, before } = session.submit(input)
     if (result.event) {
-      const danger = analyzeDanger(input, before)
-      const sudo = danger !== null && danger.kind !== 'fork-bomb' && danger.sudo
-      const newBadge = !progress.secrets[CHAOS_BADGE]
-      earnSecret(CHAOS_BADGE)
+      // Wiping only the home folder (no sudo) is not breaking the system: no badge.
+      const home = result.event === 'home-wiped'
+      const newBadge = !home && !progress.secrets[CHAOS_BADGE]
+      if (!home) earnSecret(CHAOS_BADGE)
+      const stats: WipeStats | undefined = home
+        ? {
+            deleted: countNodes(before.fs) - countNodes(result.state.fs),
+            protectedCount: result.stderr.split('\n').filter((l) => l.endsWith('Permission denied')).length,
+          }
+        : undefined
       if (result.event === 'frozen') session.print(Array.from({ length: 14 }, () => FORK_ERROR), 'err')
 
       const reduced = prefersReducedMotion()
       setCrash({
         kind: result.event,
         command: input.trim(),
-        sudo,
         newBadge,
+        stats,
         stage: reduced ? 'screen' : 'falling',
         before,
       })
-      setPipLine(result.event === 'frozen' ? 'Brrr. Everything is s-s-stuck!' : 'Uh oh. Uh oh! UH OH!')
+      setPipLine(
+        result.event === 'frozen'
+          ? 'Brrr. Everything is s-s-stuck!'
+          : home
+            ? 'My files! All gone... but look at all those Permission denied lines. Linux is still standing.'
+            : 'Uh oh. Uh oh! UH OH!',
+      )
       if (!reduced) {
         timer.current = window.setTimeout(() => {
           setCrash((c) => (c ? { ...c, stage: 'screen' } : c))
@@ -114,8 +133,8 @@ export function SandboxPage() {
         <CrashScreen
           kind={crash.kind}
           command={crash.command}
-          sudo={crash.sudo}
           newBadge={crash.newBadge}
+          stats={crash.stats}
           onReset={reset}
         />
       </Page>
@@ -143,7 +162,7 @@ export function SandboxPage() {
           lines={session.lines}
           prompt={session.prompt}
           title={title}
-          state={falling && crash ? crash.before : session.state}
+          state={falling && crash && crash.kind !== 'home-wiped' ? crash.before : session.state}
           onSubmit={handleSubmit}
           commands={ALL_COMMANDS}
           onPrint={session.print}
@@ -154,7 +173,7 @@ export function SandboxPage() {
         />
 
         <div className={styles.pipRow}>
-          <span className={falling ? styles.panic : undefined}>
+          <span className={falling && crash?.kind !== 'home-wiped' ? styles.panic : undefined}>
             <Pip size={88} mood="happy" />
           </span>
           <div className={styles.bubble}>

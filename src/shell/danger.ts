@@ -11,8 +11,11 @@ import type { ShellState } from './types'
 export type Danger =
   /** Recursive rm on "/" stopped by GNU rm's built-in failsafe. */
   | { kind: 'preserve-root'; sudo: boolean }
-  /** Recursive rm that deletes "/" or the system folders Linux needs. */
-  | { kind: 'wipe'; sudo: boolean }
+  /**
+   * Recursive rm that deletes "/" or the system folders Linux needs.
+   * `coversHome` is true when the home folder is among what it deletes.
+   */
+  | { kind: 'wipe'; sudo: boolean; coversHome: boolean }
   /** A function that keeps starting copies of itself. */
   | { kind: 'fork-bomb' }
 
@@ -101,9 +104,10 @@ export function analyzeDanger(line: string, state: ShellState): Danger | null {
   if (opts.error || !opts.recursive || opts.interactive === 'always' || opts.interactive === 'once') return null
 
   const targets = opts.operands.map((op) => resolvePath(state.cwd, op, state.home))
+  const coversHome = targets.some((t) => t === '/' || t === state.home || state.home.startsWith(t + '/'))
   if (targets.includes('/')) {
-    return opts.preserveRoot ? { kind: 'preserve-root', sudo } : { kind: 'wipe', sudo }
+    return opts.preserveRoot ? { kind: 'preserve-root', sudo } : { kind: 'wipe', sudo, coversHome }
   }
   const hitsSystem = targets.some((t) => SYSTEM_DIRS.includes(t) && getNode(state.fs, t) !== null)
-  return hitsSystem ? { kind: 'wipe', sudo } : null
+  return hitsSystem ? { kind: 'wipe', sudo, coversHome } : null
 }

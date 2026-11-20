@@ -1,8 +1,11 @@
 import type { ShellEvent } from '../shell'
 import { SITE_URL } from '../site'
 
+/** The screens that can be shared (HOME FOLDER WIPED has no SHARE button). */
+export type SystemBreak = Exclude<ShellEvent, 'home-wiped'>
+
 /** The text shared from the SYSTEM DESTROYED and SYSTEM FROZEN screens. */
-export function crashShareText(command: string, kind: ShellEvent): string {
+export function crashShareText(command: string, kind: SystemBreak): string {
   const did = kind === 'frozen' ? 'froze' : 'destroyed'
   return `I just ${did} Linux with ${command.trim()} in Pixel Linux Quest. Can you break it too? ${SITE_URL}`
 }

@@ -86,15 +86,16 @@ describe('analyzeDanger', () => {
   )
   it('a leading sudo works the same way', () => {
     expect(analyzeDanger('sudo rm -rf /', s)).toEqual({ kind: 'preserve-root', sudo: true })
-    expect(analyzeDanger('sudo rm -rf /*', s)).toEqual({ kind: 'wipe', sudo: true })
+    expect(analyzeDanger('sudo rm -rf /*', s)).toEqual({ kind: 'wipe', sudo: true, coversHome: true })
   })
-  it.each([
-    'rm -rf --no-preserve-root /',
-    'rm -rf / --no-preserve-root',
-    'rm -rf /*',
-    'rm -r "/etc"',
-  ])('%s wipes the system', (line) => {
-    expect(analyzeDanger(line, s)).toEqual({ kind: 'wipe', sudo: false })
+  it.each(['rm -rf --no-preserve-root /', 'rm -rf / --no-preserve-root', 'rm -rf /*'])(
+    '%s wipes the system, home folder included',
+    (line) => {
+      expect(analyzeDanger(line, s)).toEqual({ kind: 'wipe', sudo: false, coversHome: true })
+    },
+  )
+  it('rm -r "/etc" wipes the system but not the home folder', () => {
+    expect(analyzeDanger('rm -r "/etc"', s)).toEqual({ kind: 'wipe', sudo: false, coversHome: false })
   })
   it.each(['rm -rfi --no-preserve-root /', 'rm -rI /*', 'rm -fi -r /etc'])(
     '%s asks first (and nobody can answer), so it is not a wipe',
@@ -161,13 +162,30 @@ describe('rm', () => {
     expect(r.event).toBe('destroyed')
     expect(Object.keys(r.state.fs.children)).toEqual([])
   })
-  it('without sudo, it still counts as a wipe, but only pip’s own files go, as on real Linux', () => {
-    const r = runCommand(system(), 'rm -rf --no-preserve-root /', SANDBOX)
-    expect(r.event).toBe('destroyed')
-    expect(r.stderr).toContain("rm: cannot remove '/bin/ls': Permission denied")
-    expect(getNode(r.state.fs, '/bin/ls')).not.toBeNull()
-    expect(getNode(r.state.fs, '/home/pip/notes.txt')).toBeNull()
-    expect(getNode(r.state.fs, '/home/pip')).not.toBeNull()
+  it.each(['rm -rf --no-preserve-root /', 'rm -rf /*'])(
+    'without sudo, %s only deletes pip’s own files: the home folder is wiped, Linux survives',
+    (line) => {
+      const r = runCommand(system(), line, SANDBOX)
+      expect(r.event).toBe('home-wiped')
+      expect(r.stderr).toContain("rm: cannot remove '/bin/ls': Permission denied")
+      expect(r.code).toBe(1)
+      expect(getNode(r.state.fs, '/bin/ls')).not.toBeNull()
+      expect(getNode(r.state.fs, '/etc/hostname')).not.toBeNull()
+      expect(getNode(r.state.fs, '/home/pip/notes.txt')).toBeNull()
+      expect(getNode(r.state.fs, '/home/pip/docs')).toBeNull()
+      // pip cannot delete its own home folder: /home belongs to root.
+      expect(getNode(r.state.fs, '/home/pip')).not.toBeNull()
+    },
+  )
+  it('without sudo, rm -rf /etc only hits Permission denied: no screen at all', () => {
+    const r = runCommand(system(), 'rm -rf /etc', SANDBOX)
+    expect(r.event).toBeNull()
+    expect(r.stderr).toBe("rm: cannot remove '/etc/hostname': Permission denied")
+    expect(getNode(r.state.fs, '/etc/hostname')).not.toBeNull()
+  })
+  it('with sudo, the same commands destroy the system', () => {
+    expect(runCommand(system(), 'sudo rm -rf /etc', SANDBOX).event).toBe('destroyed')
+    expect(runCommand(system(), 'sudo rm -rf --no-preserve-root /', SANDBOX).event).toBe('destroyed')
   })
   it('rm -rf /* destroys the system because the shell expands the *', () => {
     const r = runCommand(system(), 'sudo rm -rf /*', SANDBOX)
