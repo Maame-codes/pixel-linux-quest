@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { SettingsMenu } from '../components/SettingsMenu'
 import { XPBar } from '../components/XPBar'
 import { BreakNudge } from './BreakNudge'
+import { FROM_LEVEL } from './breakEntry'
 import { getWorld } from '../content/worlds'
 import type { Level } from '../content/types'
 import { useProgress } from './ProgressContext'
@@ -30,7 +31,7 @@ export function LevelShell({ level, children }: LevelShellProps) {
             <Link to="/map" className={styles.back}>
               &lt; MAP
             </Link>
-            <Link to="/break" className={styles.back}>
+            <Link to="/break" state={FROM_LEVEL} className={styles.back}>
               BREAK ROOM
             </Link>
             <div className={styles.labels}>

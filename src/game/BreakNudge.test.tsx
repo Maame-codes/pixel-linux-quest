@@ -1,10 +1,11 @@
 import { act, fireEvent, render, screen, within } from '@testing-library/react'
-import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { reloadSettings, setSetting } from '../arcade/settings'
 import { SettingsMenu } from '../components/SettingsMenu'
 import { BreakNudge } from './BreakNudge'
+import { cameFromLevel } from './breakEntry'
 import {
   MINUTE_MS,
   addActive,
@@ -16,6 +17,11 @@ import {
 } from './nudgeClock'
 
 const MESSAGE = "You've been at it for a while. Want a quick break?"
+
+/** Stands in for the Break Room: says whether the break came from a level. */
+function BreakProbe() {
+  return <p>{cameFromLevel(useLocation().state) ? 'break room, from a level' : 'break room'}</p>
+}
 
 function renderNudge() {
   render(
@@ -30,7 +36,7 @@ function renderNudge() {
             </>
           }
         />
-        <Route path="/break" element={<p>break room</p>} />
+        <Route path="/break" element={<BreakProbe />} />
       </Routes>
     </MemoryRouter>,
   )
@@ -75,14 +81,14 @@ describe('BreakNudge', () => {
   })
   afterEach(() => vi.useRealTimers())
 
-  it('appears after 20 minutes and TAKE A BREAK goes to the Break Room', () => {
+  it('appears after 20 minutes and TAKE A BREAK starts a break from the level (with a timer)', () => {
     renderNudge()
     minutes(19)
     expect(screen.queryByText(MESSAGE)).not.toBeInTheDocument()
     minutes(1.5)
     expect(screen.getByText(MESSAGE)).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'TAKE A BREAK' }))
-    expect(screen.getByText('break room')).toBeInTheDocument()
+    expect(screen.getByText('break room, from a level')).toBeInTheDocument()
   })
 
   it('NOT NOW hides it for another 20 minutes', () => {

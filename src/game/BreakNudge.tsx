@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { useSetting } from '../arcade/settings'
+import { FROM_LEVEL } from './breakEntry'
 import { Pip } from '../components/Pip'
 import { PixelButton } from '../components/PixelButton'
 import {
@@ -66,7 +67,7 @@ export function BreakNudge() {
           className={styles.btn}
           onClick={() => {
             resetNudgeClock()
-            navigate('/break')
+            navigate('/break', { state: FROM_LEVEL })
           }}
         >
           TAKE A BREAK

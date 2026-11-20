@@ -1,13 +1,19 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 import { ARCADE_GAMES, type ArcadeGame } from '../arcade/games'
 import { getHighScore } from '../arcade/highScores'
 import {
+  QUICK_MINUTES,
+  canStep,
   extendBreak,
   formatClock,
+  hasTimer,
   isBreakOver,
-  newBreak,
+  noTimer,
+  setBreak,
+  startingBreak,
+  stepBreak,
   tickBreak,
   type BreakTimer,
 } from '../arcade/breakTimer'
@@ -15,6 +21,7 @@ import { getSettings } from '../arcade/settings'
 import { Page } from '../components/Page'
 import { Pip } from '../components/Pip'
 import { PixelButton } from '../components/PixelButton'
+import { cameFromLevel } from '../game/breakEntry'
 import { IntroArt } from '../game/IntroArt'
 import { CABINETS } from '../game/pixelArt/scenes/break-room'
 import { SCENE_H, SCENE_W } from '../game/pixelArt/scene'
@@ -36,10 +43,13 @@ function ClockIcon() {
 
 export function BreakRoomPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { progress } = useProgress()
-  // The length is read once: changing it mid-break applies to the next break.
-  const [minutes] = useState(() => getSettings().breakMinutes)
-  const [timer, setTimer] = useState<BreakTimer>(() => newBreak(minutes))
+  // From a level, the break starts with the "Break length" setting; from
+  // anywhere else, with no timer. Changes last for this visit only.
+  const [timer, setTimer] = useState<BreakTimer>(() =>
+    startingBreak(cameFromLevel(location.state), getSettings().breakMinutes),
+  )
   const [open, setOpen] = useState<ArcadeGame | null>(null)
   const [roundRunning, setRoundRunning] = useState(false)
   const [, setScoresVersion] = useState(0)
@@ -80,14 +90,82 @@ export function BreakRoomPage() {
       <Pip size={56} />
       <div className={styles.promptBody}>
         <p className={styles.promptText}>Ready to jump back in?</p>
-        <p className={styles.promptSub}>Or stay a bit longer: each tap adds 2 minutes.</p>
+        <p className={styles.promptSub}>Or take a few more minutes, or carry on with no timer.</p>
         <div className={styles.promptButtons}>
           <PixelButton onClick={backToQuest}>BACK TO MY QUEST</PixelButton>
-          <PixelButton variant="secondary" onClick={() => setTimer(extendBreak)}>
-            STAY A BIT LONGER
+          {QUICK_MINUTES.map((m) => (
+            <PixelButton
+              key={m}
+              variant="secondary"
+              onClick={() => setTimer((t) => extendBreak(t, m))}
+              aria-label={`${m} more minutes`}
+            >
+              +{m}
+            </PixelButton>
+          ))}
+          <PixelButton variant="secondary" onClick={() => setTimer(noTimer())}>
+            NO TIMER
           </PixelButton>
         </div>
       </div>
+    </div>
+  )
+
+  const clockText = hasTimer(timer) ? formatClock(timer.remainingMs) : null
+  const controls = (
+    <div className={styles.timerBar} role="group" aria-label="Break timer">
+      {clockText !== null ? (
+        <>
+          <button
+            type="button"
+            className={styles.step}
+            onClick={() => setTimer((t) => stepBreak(t, -1))}
+            disabled={!canStep(timer, -1)}
+            aria-label="One minute less"
+          >
+            -
+          </button>
+          <div className={styles.clock} role="timer" aria-label={`Break time left: ${clockText}`}>
+            <ClockIcon />
+            <span className={styles.clockText}>{clockText}</span>
+          </div>
+          <button
+            type="button"
+            className={styles.step}
+            onClick={() => setTimer((t) => stepBreak(t, 1))}
+            disabled={!canStep(timer, 1)}
+            aria-label="One minute more"
+          >
+            +
+          </button>
+          <div className={styles.quick}>
+            {QUICK_MINUTES.map((m) => (
+              <button
+                key={m}
+                type="button"
+                className={styles.quickBtn}
+                onClick={() => setTimer(setBreak(m))}
+                aria-label={`${m} minutes`}
+              >
+                {m}
+              </button>
+            ))}
+            <button type="button" className={styles.quickBtn} onClick={() => setTimer(noTimer())}>
+              NO TIMER
+            </button>
+          </div>
+        </>
+      ) : (
+        <>
+          <div className={styles.clock}>
+            <ClockIcon />
+            <span className={styles.noTimer}>NO TIMER</span>
+          </div>
+          <PixelButton variant="secondary" onClick={() => setTimer(setBreak(getSettings().breakMinutes))}>
+            SET A TIMER
+          </PixelButton>
+        </>
+      )}
     </div>
   )
 
@@ -97,19 +175,15 @@ export function BreakRoomPage() {
     <Page>
       <div className={styles.head}>
         <h1 className={styles.title}>BREAK ROOM</h1>
-        <div className={styles.headRight}>
-          <div className={styles.clock} role="timer" aria-label={`Break time left: ${formatClock(timer.remainingMs)}`}>
-            <ClockIcon />
-            <span className={styles.clockText}>{formatClock(timer.remainingMs)}</span>
-          </div>
-          <PixelButton variant="secondary" onClick={backToQuest} className={styles.back}>
-            BACK TO MY QUEST
-          </PixelButton>
-        </div>
+        <PixelButton variant="secondary" onClick={backToQuest} className={styles.back}>
+          BACK TO MY QUEST
+        </PixelButton>
       </div>
 
+      {controls}
+
       <p className={styles.lead}>
-        A {minutes} minute breather. Play a round or two, then hop back into your quest. Your progress is safe.
+        A short breather. Play a round or two, then hop back into your quest. Your progress is safe.
       </p>
 
       {showPrompt ? prompt : null}
