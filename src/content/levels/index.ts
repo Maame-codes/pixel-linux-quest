@@ -8,6 +8,12 @@ import { movingAround } from './w2l2-moving-around'
 import { findingYourWay } from './w2l3-finding-your-way'
 import { digAFolder } from './w2l4-dig-a-folder'
 import { gettingHelp } from './w2l5-getting-help'
+import { copyAndMove } from './w3l1-copy-and-move'
+import { cleanUp } from './w3l2-clean-up'
+import { readTheLogs } from './w3l3-read-the-logs'
+import { findIt } from './w3l4-find-it'
+import { permissions } from './w3l5-permissions'
+import { forestFire } from './w3l6-forest-fire'
 
 /** Every level, sorted into play order (by world, then by level). */
 export const LEVELS: Level[] = [
@@ -19,6 +25,12 @@ export const LEVELS: Level[] = [
   findingYourWay,
   digAFolder,
   gettingHelp,
+  copyAndMove,
+  cleanUp,
+  readTheLogs,
+  findIt,
+  permissions,
+  forestFire,
 ].sort((a, b) => a.world - b.world || a.level - b.level)
 
 const BY_ID = new Map(LEVELS.map((lvl) => [lvl.id, lvl]))

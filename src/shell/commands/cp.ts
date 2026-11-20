@@ -41,7 +41,22 @@ export function isInside(outer: string, inner: string): boolean {
   return inner === outer || inner.startsWith(outer === '/' ? '/' : outer + '/')
 }
 
-type CopyCtx = { state: ShellState; errors: string[]; said: string[]; verbose: boolean }
+type CopyCtx = {
+  state: ShellState
+  errors: string[]
+  said: string[]
+  verbose: boolean
+  /** -i asks before replacing a file, -n never replaces one. */
+  keep: 'ask' | 'never' | null
+  /** -i questions. This terminal cannot answer them, so the answer is no. */
+  asked: string[]
+}
+
+/** Should an existing file be left alone (cp -i or -n)? */
+export function keepExisting(cmd: string, keep: 'ask' | 'never' | null, shown: string, asked: string[]): boolean {
+  if (keep === 'ask') asked.push(`${cmd}: overwrite '${shown}'? `)
+  return keep !== null
+}
 
 /** Copy one file onto `target` (made new, or overwritten). */
 function copyFile(ctx: CopyCtx, srcAbs: string, src: FsNode & { kind: 'file' }, srcShown: string, target: { shown: string; abs: string }): void {
@@ -56,6 +71,7 @@ function copyFile(ctx: CopyCtx, srcAbs: string, src: FsNode & { kind: 'file' }, 
       ctx.errors.push(`cp: cannot overwrite directory '${target.shown}' with non-directory`)
       return
     }
+    if (keepExisting('cp', ctx.keep, target.shown, ctx.asked)) return
     if (!permits(state, target.abs, existing.node, 'w')) {
       ctx.errors.push(`cp: cannot create regular file '${target.shown}': Permission denied`)
       return
@@ -119,19 +135,21 @@ function copyDir(ctx: CopyCtx, srcAbs: string, src: DirNode, srcShown: string, t
 export const cp: Command = {
   name: 'cp',
   summary: 'copy files and directories',
-  usage: 'cp [-r] SOURCE DEST',
+  usage: 'cp [-r] [-i] SOURCE DEST',
   description:
     'Copies a file. If DEST is a directory, the copy goes inside it with the same name. To copy a directory and everything in it, add -r (recursive).',
   run: ({ args, state }) => {
     const opts = parseOptions('cp', args, {
-      flags: 'rRv',
-      long: { recursive: 'r', verbose: 'v' },
+      flags: 'rRvin',
+      long: { recursive: 'r', verbose: 'v', interactive: 'i', 'no-clobber': 'n' },
     })
     if (opts.error) return { stderr: opts.error, code: 1 }
     const plan = planTransfer('cp', opts.operands, state)
     if ('error' in plan) return { stderr: plan.error, code: 1 }
     const recursive = opts.flags.has('r') || opts.flags.has('R')
-    const ctx: CopyCtx = { state, errors: [], said: [], verbose: opts.flags.has('v') }
+    // The last of -i and -n wins in GNU cp; here -n wins if both are given.
+    const keep = opts.flags.has('n') ? 'never' : opts.flags.has('i') ? 'ask' : null
+    const ctx: CopyCtx = { state, errors: [], said: [], verbose: opts.flags.has('v'), keep, asked: [] }
 
     for (const src of plan.sources) {
       const found = lookup(state, src.abs)
@@ -162,7 +180,7 @@ export const cp: Command = {
     return {
       state,
       stdout: ctx.said.join('\n') || undefined,
-      stderr: ctx.errors.join('\n') || undefined,
+      stderr: [...ctx.asked, ...ctx.errors].join('\n') || undefined,
       code: ctx.errors.length > 0 ? 1 : 0,
     }
   },

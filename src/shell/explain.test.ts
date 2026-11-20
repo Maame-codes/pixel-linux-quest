@@ -257,6 +257,10 @@ describe('explainMistake: World 3 commands', () => {
     expect(explain3('rm readonly.txt')).toContain('This terminal cannot answer questions')
   })
 
+  it('cp -i and mv -i asking before replacing a file', () => {
+    expect(explain3('cp -i a.txt b.txt')).toContain('-i makes cp ask before replacing')
+  })
+
   it('head and tail with a bad line count', () => {
     expect(explain3('head -n many log.txt')).toBe('After -n comes a number of lines, like -n 5.')
   })

@@ -19,7 +19,8 @@ export function LevelShell({ level, children }: LevelShellProps) {
   const { progress } = useProgress()
   const world = getWorld(level.world)
   const worldLabel = `WORLD ${level.world}: ${(world?.name ?? '').toUpperCase()}`
-  const levelLabel = `LEVEL ${level.level}: ${level.title.toUpperCase()}`
+  const boss = level.test.kind === 'challenge' && level.test.boss
+  const levelLabel = `${boss ? 'BOSS ' : ''}LEVEL ${level.level}: ${level.title.toUpperCase()}`
 
   return (
     <div className={styles.shell}>

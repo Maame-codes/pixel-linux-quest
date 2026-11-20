@@ -19,10 +19,12 @@ export type Settings = {
   nudgeMinutes: NudgeMinutes
   /** How long a break in the Break Room lasts. */
   breakMinutes: BreakMinutes
+  /** The countdown in boss levels. Players who want no time pressure can turn it off. */
+  bossTimer: boolean
 }
 
 const KEY = 'plq.settings'
-export const DEFAULT_SETTINGS: Settings = { sound: false, nudgeMinutes: 20, breakMinutes: 5 }
+export const DEFAULT_SETTINGS: Settings = { sound: false, nudgeMinutes: 20, breakMinutes: 5, bossTimer: true }
 
 function pick<T>(choices: readonly T[], value: unknown, fallback: T): T {
   return choices.includes(value as T) ? (value as T) : fallback
@@ -38,6 +40,7 @@ export function parseSettings(raw: unknown): Settings {
     sound: typeof p.sound === 'boolean' ? p.sound : DEFAULT_SETTINGS.sound,
     nudgeMinutes,
     breakMinutes: pick(BREAK_CHOICES, p.breakMinutes, DEFAULT_SETTINGS.breakMinutes),
+    bossTimer: typeof p.bossTimer === 'boolean' ? p.bossTimer : DEFAULT_SETTINGS.bossTimer,
   }
 }
 

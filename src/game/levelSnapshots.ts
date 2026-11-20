@@ -10,6 +10,10 @@ export type LevelSnapshot = {
   state: ShellState
   lines: TerminalLine[]
   done: boolean[]
+  /** Tries per objective, for SHOW ANSWER in boss levels and recall objectives. */
+  attempts?: number[]
+  /** Boss levels: time left on the clock. */
+  timeLeftMs?: number
 }
 
 const snapshots = new Map<string, LevelSnapshot>()

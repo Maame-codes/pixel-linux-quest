@@ -239,6 +239,16 @@ describe('cp', () => {
     )
   })
 
+  it('-i asks before replacing a file (and this terminal cannot answer, so it keeps it); -n never replaces', () => {
+    const r = run('cp -i notes.txt diary.txt')
+    expect(r.stderr).toBe("cp: overwrite 'diary.txt'? ")
+    const diary = node(r.state, '/home/pip/diary.txt')
+    expect(isFile(diary) && diary.content).toBe('dear diary')
+    expect(run('cp -i notes.txt fresh.txt').stderr).toBe('')
+    expect(run('cp -n notes.txt diary.txt').stderr).toBe('')
+    expect(run('mv -i notes.txt diary.txt').stderr).toBe("mv: overwrite 'diary.txt'? ")
+  })
+
   it('-v says what it copied', () => {
     expect(run('cp -v notes.txt b.txt').stdout).toBe("'notes.txt' -> 'b.txt'")
   })

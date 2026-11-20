@@ -10,6 +10,12 @@ export type Objective = {
   answer: string
   /** Returns true once this objective is satisfied. */
   check: (shell: ShellState, last: CommandResult) => boolean
+  /**
+   * A recall objective: a command from an earlier world, with no hint. Pip
+   * may say which world it came from, never the command. SHOW ANSWER only
+   * appears after 3 tries.
+   */
+  recall?: boolean
 }
 
 export type ChallengeTest = {
@@ -21,6 +27,17 @@ export type ChallengeTest = {
   /** Commands unlocked for this level. */
   commands: string[]
   objectives: Objective[]
+  /**
+   * A boss level: timed (the player can turn the timer off in settings), and
+   * SHOW ANSWER only appears after 3 tries. Running out of time costs nothing.
+   */
+  boss?: { timeLimitSec: number }
+  /**
+   * Called after every command. Return a message if the mission can no
+   * longer be won (an important file was deleted), and the level must be
+   * restarted. Return null while all is well.
+   */
+  failure?: (shell: ShellState) => string | null
 }
 
 export type QuizQuestion = {

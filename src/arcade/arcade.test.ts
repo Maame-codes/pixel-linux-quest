@@ -61,13 +61,13 @@ describe('settings', () => {
   })
 
   it('sound is off, reminders every 20 minutes and 5 minute breaks by default', () => {
-    expect(getSettings()).toEqual({ sound: false, nudgeMinutes: 20, breakMinutes: 5 })
+    expect(getSettings()).toEqual({ sound: false, nudgeMinutes: 20, breakMinutes: 5, bossTimer: true })
   })
 
   it('migrates the old on/off nudge switch', () => {
     localStorage.setItem('plq.settings', JSON.stringify({ sound: true, nudges: false }))
     reloadSettings()
-    expect(getSettings()).toEqual({ sound: true, nudgeMinutes: 0, breakMinutes: 5 })
+    expect(getSettings()).toEqual({ sound: true, nudgeMinutes: 0, breakMinutes: 5, bossTimer: true })
     expect(parseSettings({ nudges: true }).nudgeMinutes).toBe(20)
   })
 
@@ -76,6 +76,7 @@ describe('settings', () => {
       sound: false,
       nudgeMinutes: 20,
       breakMinutes: 5,
+      bossTimer: true,
     })
     expect(parseSettings(null).breakMinutes).toBe(5)
   })

@@ -102,7 +102,7 @@ export function MapPage() {
         <div className={styles.mapHead}>
           <h2 className={styles.mapTitle}>WORLD MAP</h2>
           <span className={styles.mapMeta}>
-            {WORLDS.length} worlds, {totalLevels} levels, 1 final boss
+            {WORLDS.length} worlds, {totalLevels} levels, a boss at the end of each world from World 3
           </span>
         </div>
         <div className={styles.grid}>

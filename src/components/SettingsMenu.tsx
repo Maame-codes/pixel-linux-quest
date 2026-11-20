@@ -121,6 +121,7 @@ export function SettingsMenu() {
   const [sound, setSound] = useSetting('sound')
   const [nudgeMinutes, setNudgeMinutes] = useSetting('nudgeMinutes')
   const [breakMinutes, setBreakMinutes] = useSetting('breakMinutes')
+  const [bossTimer, setBossTimer] = useSetting('bossTimer')
   const panelId = useId()
   const wrapRef = useRef<HTMLDivElement>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -184,6 +185,7 @@ export function SettingsMenu() {
             {breakMinutes} minutes
           </p>
           <Toggle label="Sound" on={sound} onChange={setSound} />
+          <Toggle label="Boss level timer" on={bossTimer} onChange={setBossTimer} />
           <ClearData />
           <p className={styles.privacy}>Everything is saved only in your browser. Nothing is sent to a server.</p>
           <FeedbackLink className={styles.feedback} />

@@ -2,16 +2,21 @@ import { parseOptions } from '../options'
 import { basename, dirname } from '../path'
 import { ERRNO_TEXT, lookup, permits, touched, unlinkError } from '../perm'
 import { isDir, type Command, type DirNode } from '../types'
-import { isInside, planTransfer } from './cp'
+import { isInside, keepExisting, planTransfer } from './cp'
 
 export const mv: Command = {
   name: 'mv',
   summary: 'move or rename files and directories',
-  usage: 'mv SOURCE DEST',
+  usage: 'mv [-i] SOURCE DEST',
   description:
     'Moves a file or directory. If DEST is a directory, it goes inside it. Otherwise it is renamed to DEST. No -r is needed for directories.',
   run: ({ args, state }) => {
-    const opts = parseOptions('mv', args, { flags: 'v', long: { verbose: 'v' } })
+    const opts = parseOptions('mv', args, {
+      flags: 'vin',
+      long: { verbose: 'v', interactive: 'i', 'no-clobber': 'n' },
+    })
+    const keep = opts.flags.has('n') ? 'never' : opts.flags.has('i') ? 'ask' : null
+    const asked: string[] = []
     if (opts.error) return { stderr: opts.error, code: 1 }
     const plan = planTransfer('mv', opts.operands, state)
     if ('error' in plan) return { stderr: plan.error, code: 1 }
@@ -50,6 +55,7 @@ export const mv: Command = {
       }
       const existing = destParent.node.children[basename(target.abs)]
       if (existing) {
+        if (keepExisting('mv', keep, target.shown, asked)) continue
         if (isDir(node) && !isDir(existing)) {
           errors.push(`mv: cannot overwrite non-directory '${target.shown}' with directory '${src.shown}'`)
           continue
@@ -96,7 +102,7 @@ export const mv: Command = {
     return {
       state,
       stdout: said.join('\n') || undefined,
-      stderr: errors.join('\n') || undefined,
+      stderr: [...asked, ...errors].join('\n') || undefined,
       code: errors.length > 0 ? 1 : 0,
     }
   },

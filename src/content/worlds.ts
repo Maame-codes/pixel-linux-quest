@@ -23,8 +23,8 @@ export const WORLDS: World[] = [
   {
     num: 3,
     name: 'File Forest',
-    topic: 'Create, copy, move and delete files. Meet permissions.',
-    levelCount: 4,
+    topic: 'Copy, move and delete files, read logs, find lost files and lock them with permissions. Ends with a boss level.',
+    levelCount: 6,
   },
   {
     num: 4,

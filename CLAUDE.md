@@ -26,7 +26,7 @@ Hosted on Vercel as a static site. No backend, no accounts.
 - **Break timer.** A break lasts 3, 5 or 10 minutes (the "Break length" setting, default 5), shown as a small pixel clock (counts only while the tab is visible). When time is up, the current round finishes first, then Pip asks "Ready to jump back in?" with BACK TO MY QUEST and STAY A BIT LONGER (+2 minutes, as many times as the player likes). BACK TO MY QUEST is always visible.
 - **Going back.** The last page outside the Break Room is remembered in localStorage (`src/game/returnTo.ts`). BACK TO MY QUEST goes there, or to the next playable level. Leaving never loses quest progress: completed levels are saved as always, and an unfinished challenge (terminal, files and ticked objectives) is kept in memory for the visit (`src/game/levelSnapshots.ts`), so coming back carries on where the learner left off.
 - **Break nudges.** Active time in levels is counted while the tab is visible. After the "Break reminder every" interval (15, 20, 30 or 45 minutes, or Off; default 20) Pip shows a small, non-blocking message above the level, "You've been at it for a while. Want a quick break?", with TAKE A BREAK (goes to `/break`) and NOT NOW (hides it for another full interval). It only appears when the learner has not typed for a few seconds and the terminal input is empty, and it never covers the terminal. Opening the Break Room starts the count again.
-- **Settings.** A gear button in the header opens a small panel with "Break reminder every" (15, 20, 30, 45 minutes or Off, default 20), "Break length" (3, 5 or 10 minutes, default 5) and sound on or off (default off), all remembered in localStorage (`src/arcade/settings.ts`). Older saves with the on/off `nudges` switch are migrated (off stays Off).
+- **Settings.** A gear button in the header opens a small panel with "Break reminder every" (15, 20, 30, 45 minutes or Off, default 20), "Break length" (3, 5 or 10 minutes, default 5), sound on or off (default off) and "Boss level timer" on or off (default on), all remembered in localStorage (`src/arcade/settings.ts`). Older saves with the on/off `nudges` switch are migrated (off stays Off).
 
 ### Rules for every Break Room game (new games must follow them too)
 
@@ -96,7 +96,10 @@ type ChallengeTest = {
     hint: string;          // Pip's gentle nudge
     answer: string;        // revealed by SHOW ANSWER
     check: (shell: ShellState, last: CommandResult) => boolean;
+    recall?: boolean;      // earlier command, no hint ("You learned this in World 2."), SHOW ANSWER after 3 tries
   }[];
+  boss?: { timeLimitSec: number };            // timed boss level, SHOW ANSWER after 3 tries
+  failure?: (shell: ShellState) => string | null; // e.g. an important file was deleted: stop, RESTART LEVEL
 };
 
 type QuizTest = {
@@ -150,7 +153,10 @@ Topic order is inspired by the free Introduction to Linux (LFS101) course, but e
 ### Design rules for World 3 onwards
 
 - **Mission framing.** Each world is told as real-world jobs, not abstract exercises. For example: "The website is down. Find the error in the logs." or "Lock this file so only you can read it." Objectives and Pip's lines follow the mission.
-- **Boss level.** Every world ends with a boss level: a harder, timed challenge that mixes everything learned in that world. The learner can retry as often as they like, with no penalty for running out of time or retrying.
+- **Boss level.** Every world ends with a boss level: a harder, timed challenge that mixes everything learned in that world. The learner can retry as often as they like, with no penalty for running out of time or retrying. The countdown only runs while the tab is visible, and the TIMER button on the level (or "Boss level timer" in settings) turns it off for players who want no time pressure. SHOW ANSWER appears only after 3 tries on each objective. The boss also has at least two recall objectives from the previous world.
+- **Recall objectives.** At least two non-boss levels per world (from World 3) include a recall objective: an earlier command with no hint. Pip may say "You learned this in World 2." but never the command, and SHOW ANSWER appears after 3 tries.
+- **Missions that can fail.** A level can define `failure` (for example deleting an important file in Clean Up). The run stops with MISSION FAILED, and RESTART LEVEL (always available in the quest card) puts everything back.
+- **World 3, File Forest, as built:** 1 Copy and Move (back up a config, tidy files), 2 Clean Up (disk full: rm, rm -r, rmdir; fails if an important file is deleted), 3 Read the Logs (website down: head, tail, wc -l in /var/log/web), 4 Find It (lost logo: find -name, quoted patterns, -type), 5 Permissions (ls -l, chmod 600 diary, chmod u+x script), 6 Boss: Forest Fire (8 minute timer, everything plus whoami and mkdir as recall). Tested in `src/content/levels/world3.test.ts`.
 
 ## Build phases
 

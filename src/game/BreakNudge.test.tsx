@@ -155,6 +155,7 @@ describe('SettingsMenu', () => {
       sound: true,
       nudgeMinutes: 0,
       breakMinutes: 10,
+      bossTimer: true,
     })
     fireEvent.keyDown(window, { key: 'Escape' })
     expect(screen.queryByRole('switch', { name: /Sound/ })).not.toBeInTheDocument()

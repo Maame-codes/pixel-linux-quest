@@ -159,6 +159,11 @@ export function explainMistake(
     return 'rm asks before deleting a file you have no w (write) permission for. This terminal cannot answer questions, so the file was kept. Adding -f skips the question.'
   }
 
+  // cp -i and mv -i asked before replacing a file; nobody can answer here.
+  if ((name === 'cp' || name === 'mv') && err.includes(': overwrite ')) {
+    return `-i makes ${name} ask before replacing a file that is already there. This terminal cannot answer questions, so nothing was replaced.`
+  }
+
   // find with an unquoted pattern that the shell expanded first.
   if (name === 'find' && tokens.ok) {
     const at = tokens.tokens.findIndex((t) => t.text === '-name' || t.text === '-iname')
