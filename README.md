@@ -1,10 +1,10 @@
 # Pixel Linux Quest
 
-A free retro pixel game that gives you a cool, brief introduction to Linux, right in your browser.
+A fun, hands-on way to learn Linux in your browser, in a retro pixel art style.
 
-Read a few short lessons with Pip the penguin, then prove what you learned by completing quests in a pretend "pocket terminal". No install, no account, nothing to break on your real computer.
+Read a few short lessons with Pip the penguin, then try it for real: type commands in a pretend "pocket terminal" and complete missions. No install, no account, nothing to break on your real computer.
 
-**Play it: https://pixel-linux-quest.vercel.app**
+**Try it: https://pixel-linux-quest.vercel.app**
 
 ![Title screen with Pip the penguin and a PRESS START button](docs/screenshots/title.png)
 
@@ -19,15 +19,26 @@ Read a few short lessons with Pip the penguin, then prove what you learned by co
 ## Features
 
 - **Short lessons, then a test.** Each level is 2 to 4 tiny lesson pages, then a terminal challenge or a quiz.
-- **A pretend terminal in the browser.** A small Linux-like shell written in TypeScript, with a virtual filesystem, real-looking error messages, quotes, `*` patterns, Tab completion, Ctrl+C and Ctrl+L, and command history.
+- **Three worlds so far.** Penguin Island (what Linux is, distros, booting), Command Caves (your first commands and moving around) and File Forest (copy, move, delete, read logs, find files and permissions).
+- **Real-world missions.** From World 3, every level is a job to do: back up a config before an update, clear a full disk without deleting what matters, find the error in a web server's log, lock your diary with `chmod 600`.
+- **Boss levels.** Every world from File Forest ends with a timed boss that mixes everything, plus commands from earlier worlds with no hints. Retry as often as you like; the timer can be switched off.
+- **A pretend terminal in the browser.** A small Linux-like shell written in TypeScript: a virtual filesystem with owners, groups and rwx permissions, GNU-style error messages, `ls -l`, `cp`, `mv`, `rm`, `rmdir`, `head`, `tail`, `wc`, `find`, `chmod`, quotes, `*` patterns, Tab completion, Ctrl+C and Ctrl+L, and command history.
 - **Pip explains mistakes.** When a command fails you still see the real error, and Pip adds a short, friendly explanation without giving the answer away.
 - **Live folder map.** A pixel map of the folders sits next to the terminal, with Pip standing wherever you are.
 - **World map, XP and badges.** Worlds unlock in order. Progress is saved in your browser.
-- **Practice your weak spots.** The game counts which commands trip you up (only the command name and a count, never what you typed) and offers a short practice round for them.
+- **Practice your weak spots.** Pixel Linux Quest counts which commands trip you up (only the command name and a count, never what you typed) and offers a short round of practice tasks for them.
 - **Intro story.** A short pixel art cutscene about how Unix, GNU and Linux came to be.
-- **Break It sandbox.** Every command, a realistic pretend system and no rules. Try `rm -rf /` and see what happens (and find the secret badge).
-- **Break Room.** A tiny pixel arcade for a five minute break: Packet Snake, Bug Smash and Bit Breaker. Every game over screen has a true Linux tip.
+- **Break It sandbox.** Every command, a realistic pretend system where root owns the system files, and no rules. Try `sudo rm -rf /` and see what happens (and find the secret badge).
+- **Break Room.** A tiny pixel arcade with mini games for a short break: Packet Snake, Bug Smash and Bit Breaker. Every game over screen has a true Linux tip.
+- **Breaks your way.** Choose how often Pip suggests a break (every 15, 20, 30 or 45 minutes, or never) and how long a break lasts (3, 5 or 10 minutes), and stay a bit longer whenever you like.
 - **Accessible.** Real buttons and links, keyboard play, readable fonts, visible focus, works on phones and respects reduced motion.
+
+## Coming next
+
+- **World 4, Process Peaks:** running programs, `ps`, `kill`, jobs, environment variables, `PATH`, `alias` and a gentle look at `nano`.
+- **World 5, Text Tundra:** redirection, pipes, `grep`, `sort`, `uniq`, `wc` and `cut`.
+- **World 6, Script Castle:** your first Bash script, networking basics, users and `sudo`, and the final boss.
+- **Pip's Fishing:** a calm new Break Room mini game.
 
 ## Privacy
 

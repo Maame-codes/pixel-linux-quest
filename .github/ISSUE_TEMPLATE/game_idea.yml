@@ -1,12 +1,12 @@
-name: Game idea
-description: Suggest a new Break Room game or a change to one.
+name: Mini game idea
+description: Suggest a new Break Room mini game or a change to one.
 labels: [arcade, idea]
 body:
   - type: textarea
     id: idea
     attributes:
-      label: The game
-      description: How does it play, in a few sentences? Games must be original, so please do not base it on a specific existing game.
+      label: The mini game
+      description: How does it play, in a few sentences? Mini games must be original, so please do not base one on a specific existing game.
     validations:
       required: true
   - type: textarea

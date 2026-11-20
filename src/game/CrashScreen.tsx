@@ -45,7 +45,7 @@ const SHARE_MESSAGES = {
 } as const
 
 /** SHARE: the share sheet on phones, the clipboard everywhere else. */
-function ShareButton({ command }: { command: string }) {
+function ShareButton({ command, kind }: { command: string; kind: ShellEvent }) {
   const [message, setMessage] = useState<keyof typeof SHARE_MESSAGES | null>(null)
   useEffect(() => {
     if (!message) return
@@ -54,7 +54,7 @@ function ShareButton({ command }: { command: string }) {
   }, [message])
 
   const onShare = async () => {
-    const outcome = await shareOrCopy(crashShareText(command), browserShareEnv())
+    const outcome = await shareOrCopy(crashShareText(command, kind), browserShareEnv())
     if (outcome === 'copied' || outcome === 'failed') setMessage(outcome)
   }
 
@@ -109,7 +109,7 @@ export function CrashScreen({ kind, command, sudo, newBadge, onReset }: CrashScr
         <PixelButton to="/badges" variant="secondary">
           BADGES
         </PixelButton>
-        <ShareButton command={command} />
+        <ShareButton command={command} kind={kind} />
       </div>
 
       <p className={styles.credit}>PIXEL LINUX QUEST · BREAK IT SANDBOX</p>

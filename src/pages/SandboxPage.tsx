@@ -9,6 +9,7 @@ import type { FolderMapOptions } from '../game/folderMapModel'
 import { useProgress } from '../game/ProgressContext'
 import { TerminalWithMap } from '../game/TerminalWithMap'
 import { useShellSession } from '../game/useShellSession'
+import { withSudoTip } from '../game/sudoTip'
 import {
   ALL_COMMANDS,
   analyzeDanger,
@@ -96,7 +97,8 @@ export function SandboxPage() {
       }
       return
     }
-    setPipLine(explainMistake(input, result, before, { unlocked: ALL_COMMANDS }) ?? START_LINE)
+    const explained = explainMistake(input, result, before, { unlocked: ALL_COMMANDS })
+    setPipLine(withSudoTip(input, explained) ?? START_LINE)
   }
 
   function reset() {

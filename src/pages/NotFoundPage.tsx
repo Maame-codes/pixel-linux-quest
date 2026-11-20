@@ -14,7 +14,7 @@ function Lost() {
   )
 }
 
-/** Shown for any address the game does not know. */
+/** Shown for any address the site does not know. */
 export function NotFoundPage() {
   const { pathname } = useLocation()
   return (

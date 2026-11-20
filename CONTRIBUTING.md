@@ -2,7 +2,7 @@
 
 Thank you for helping! Pixel Linux Quest is a small hobby project, so friendly, focused contributions are the best kind. Everyone taking part follows the [Code of Conduct](CODE_OF_CONDUCT.md).
 
-Not sure where to start? Open an issue first (bug report, lesson correction, level idea or game idea) and we can talk it through before you write code.
+Not sure where to start? Open an issue first (bug report, lesson correction, level idea or Break Room mini game idea) and we can talk it through before you write code.
 
 ## Run it locally
 

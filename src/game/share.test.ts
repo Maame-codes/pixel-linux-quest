@@ -14,13 +14,19 @@ function env(over: Partial<ShareEnv> = {}): ShareEnv {
 
 describe('crashShareText', () => {
   it('names the command and ends with the site URL', () => {
-    expect(crashShareText('sudo rm -rf --no-preserve-root /')).toBe(
+    expect(crashShareText('sudo rm -rf --no-preserve-root /', 'destroyed')).toBe(
       `I just destroyed Linux with sudo rm -rf --no-preserve-root / in Pixel Linux Quest. Can you break it too? ${SITE_URL}`,
     )
   })
 
+  it('says "froze", not "destroyed", for SYSTEM FROZEN', () => {
+    expect(crashShareText(':(){ :|:& };:', 'frozen')).toBe(
+      `I just froze Linux with :(){ :|:& };: in Pixel Linux Quest. Can you break it too? ${SITE_URL}`,
+    )
+  })
+
   it('has no em dashes', () => {
-    expect(crashShareText(':(){ :|:& };:')).not.toMatch(/—/)
+    expect(crashShareText(':(){ :|:& };:', 'frozen')).not.toMatch(/—/)
   })
 })
 

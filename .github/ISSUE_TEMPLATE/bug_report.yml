@@ -1,5 +1,5 @@
 name: Bug report
-description: Something in the game is broken or looks wrong.
+description: Something on the site is broken or looks wrong.
 labels: [bug]
 body:
   - type: textarea

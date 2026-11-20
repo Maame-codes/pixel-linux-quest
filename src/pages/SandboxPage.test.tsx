@@ -96,4 +96,20 @@ describe('SandboxPage', () => {
     type(':(){ :|:& };:')
     expect(screen.getByRole('heading', { name: 'SYSTEM FROZEN' })).toBeInTheDocument()
   })
+
+  it('the first sudo gets a note about the password a real system would ask for, once', () => {
+    renderPage()
+    type('sudo whoami')
+    expect(screen.getByText('root')).toBeInTheDocument()
+    expect(screen.getByText('On a real system, sudo would ask for your password first.')).toBeInTheDocument()
+    type('sudo cat /etc/shadow')
+    expect(screen.queryByText(/sudo would ask for your password/)).not.toBeInTheDocument()
+  })
+
+  it('without sudo, pip cannot read root-only files, as on real Linux', () => {
+    renderPage()
+    type('cat /etc/shadow')
+    expect(screen.getByText('cat: /etc/shadow: Permission denied')).toBeInTheDocument()
+    expect(screen.getByText(/has no r \(read\) permission/)).toBeInTheDocument()
+  })
 })
