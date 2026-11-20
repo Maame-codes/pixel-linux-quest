@@ -30,7 +30,7 @@ Read a few short lessons with Pip the penguin, then try it for real: type comman
 - **Intro story.** A short pixel art cutscene about how Unix, GNU and Linux came to be.
 - **Break It sandbox.** Every command, a realistic pretend system where root owns the system files, and no rules. Try `sudo rm -rf /` and see what happens (and find the secret badge).
 - **Break Room.** A tiny pixel arcade with mini games for a short break: Packet Snake, Bug Smash and Bit Breaker. Every game over screen has a true Linux tip.
-- **Breaks your way.** Choose how often Pip suggests a break (every 15, 20, 30 or 45 minutes, or never) and how long a break lasts (3, 5 or 10 minutes), and stay a bit longer whenever you like.
+- **Breaks your way.** Choose how often Pip suggests a break (every 15, 20, 30 or 45 minutes, or never) and how long a break from a level lasts (3, 5 or 10 minutes). In the Break Room, set the timer however you like (1 to 60 minutes, or no timer at all), and when time is up, add 5, 10 or 15 more minutes as often as you want.
 - **Accessible.** Real buttons and links, keyboard play, readable fonts, visible focus, works on phones and respects reduced motion.
 
 ## Coming next

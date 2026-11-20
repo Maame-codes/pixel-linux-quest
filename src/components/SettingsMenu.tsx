@@ -182,7 +182,7 @@ export function SettingsMenu() {
             spoken={(m) => `${m} minutes`}
           />
           <p className={styles.unit} aria-hidden="true">
-            {breakMinutes} minutes
+            {breakMinutes} minutes, for breaks taken from a level
           </p>
           <Toggle label="Sound" on={sound} onChange={setSound} />
           <Toggle label="Boss level timer" on={bossTimer} onChange={setBossTimer} />
