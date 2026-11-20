@@ -8,13 +8,15 @@ export type Progress = {
   introSeen: boolean
   /** Secret badges earned, by id (added in the same version; missing means none). */
   secrets: Record<string, true>
+  /** XP from outside levels, like practice rounds (missing in older saves means 0). */
+  bonusXp: number
 }
 
 const KEY = 'plq.progress'
 const VERSION = 1
 
 export function defaultProgress(): Progress {
-  return { version: VERSION, completed: {}, introSeen: false, secrets: {} }
+  return { version: VERSION, completed: {}, introSeen: false, secrets: {}, bonusXp: 0 }
 }
 
 /** Load progress from localStorage, falling back to a clean slate on any problem. */
@@ -32,7 +34,11 @@ export function loadProgress(): Progress {
     if (parsed.secrets && typeof parsed.secrets === 'object') {
       for (const id of Object.keys(parsed.secrets)) secrets[id] = true
     }
-    return { version: VERSION, completed, introSeen: Boolean(parsed.introSeen), secrets }
+    const bonusXp =
+      typeof parsed.bonusXp === 'number' && Number.isFinite(parsed.bonusXp) && parsed.bonusXp > 0
+        ? Math.floor(parsed.bonusXp)
+        : 0
+    return { version: VERSION, completed, introSeen: Boolean(parsed.introSeen), secrets, bonusXp }
   } catch {
     return defaultProgress()
   }
@@ -53,11 +59,12 @@ export function isCompleted(p: Progress, id: string): boolean {
 }
 
 export function earnedXp(p: Progress): number {
-  return LEVELS.reduce((sum, lvl) => (p.completed[lvl.id] ? sum + lvl.xp : sum), 0)
+  return LEVELS.reduce((sum, lvl) => (p.completed[lvl.id] ? sum + lvl.xp : sum), p.bonusXp)
 }
 
-export function totalXp(): number {
-  return LEVELS.reduce((sum, lvl) => sum + lvl.xp, 0)
+/** All the XP levels can give, plus any bonus XP already earned. */
+export function totalXp(p: Progress): number {
+  return LEVELS.reduce((sum, lvl) => sum + lvl.xp, p.bonusXp)
 }
 
 export function completedCount(p: Progress): number {
@@ -93,6 +100,15 @@ export function nextLevelInWorld(p: Progress, world: number): string | null {
   const levels = getLevelsByWorld(world)
   const next = levels.find((lvl) => !p.completed[lvl.id])
   return next ? next.id : null
+}
+
+/** Every command taught in a challenge level the player has unlocked. */
+export function unlockedCommands(p: Progress): string[] {
+  const names = new Set<string>()
+  for (const lvl of LEVELS) {
+    if (lvl.test.kind === 'challenge' && isLevelUnlocked(p, lvl.id)) lvl.test.commands.forEach((c) => names.add(c))
+  }
+  return [...names].sort()
 }
 
 /** The next level to play across the whole game, for the "continue" button. */

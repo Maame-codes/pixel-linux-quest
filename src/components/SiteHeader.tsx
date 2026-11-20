@@ -39,7 +39,7 @@ export function SiteHeader() {
         </nav>
 
         <div className={styles.right}>
-          <XPBar level={completedCount(progress)} value={earnedXp(progress)} max={totalXp()} />
+          <XPBar level={completedCount(progress)} value={earnedXp(progress)} max={totalXp(progress)} />
           <SettingsMenu />
         </div>
       </div>

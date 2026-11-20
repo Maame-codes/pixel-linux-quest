@@ -4,7 +4,10 @@ import { SpeechBubble } from '../components/SpeechBubble'
 import { WorldCard } from '../components/WorldCard'
 import { getLevelsByWorld, LEVELS } from '../content/levels'
 import { WORLDS } from '../content/worlds'
+import { PRACTISABLE } from '../content/practice'
 import { IntroArt } from '../game/IntroArt'
+import { Pip } from '../components/Pip'
+import { loadWeakSpots, PRACTICE_THRESHOLD, weakestCommands, weakTotal } from '../game/weakSpots'
 import { useProgress } from '../game/ProgressContext'
 import {
   badges,
@@ -13,6 +16,7 @@ import {
   nextLevelInWorld,
   nextPlayableLevel,
   worldClearedCount,
+  unlockedCommands,
   worldStatus,
 } from '../game/progress'
 import styles from './MapPage.module.css'
@@ -29,6 +33,12 @@ export function MapPage() {
   const continueLabel = cleared > 0 ? 'CONTINUE' : 'START LEVEL 1'
 
   const totalLevels = WORLDS.reduce((n, w) => n + w.levelCount, 0)
+
+  // Weak spots: mistakes with commands the player has unlocked and can practise.
+  const eligible = unlockedCommands(progress).filter((c) => PRACTISABLE.includes(c))
+  const weakCounts = loadWeakSpots()
+  const showPractice = weakTotal(weakCounts, eligible) >= PRACTICE_THRESHOLD
+  const weakNames = weakestCommands(weakCounts, eligible).slice(0, 3)
 
   return (
     <Page>
@@ -72,6 +82,21 @@ export function MapPage() {
           <SpeechBubble>Hi, I’m Pip! Pick a world and let’s dig in.</SpeechBubble>
         </div>
       </section>
+
+      {showPractice ? (
+        <section className={styles.practice} aria-labelledby="practice-title">
+          <Pip size={56} />
+          <div className={styles.practiceText}>
+            <h2 id="practice-title" className={styles.practiceTitle}>
+              PRACTICE YOUR WEAK SPOTS
+            </h2>
+            <p className={styles.practiceBody}>
+              A few commands tripped you up: {weakNames.join(', ')}. A quick round of short tasks will help them stick.
+            </p>
+          </div>
+          <PixelButton to="/practice">START PRACTICE</PixelButton>
+        </section>
+      ) : null}
 
       <section className={styles.mapSection}>
         <div className={styles.mapHead}>

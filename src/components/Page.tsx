@@ -21,6 +21,9 @@ export function Page({ children }: PageProps) {
           Linus Torvalds.
         </p>
         <p className={styles.footerText}>
+          Your progress, scores and settings are saved only in your browser. Nothing is sent to a server.
+        </p>
+        <p className={styles.footerText}>
           <FeedbackLink className={styles.footerLink} />
         </p>
       </footer>

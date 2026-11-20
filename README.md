@@ -23,10 +23,15 @@ Read a few short lessons with Pip the penguin, then prove what you learned by co
 - **Pip explains mistakes.** When a command fails you still see the real error, and Pip adds a short, friendly explanation without giving the answer away.
 - **Live folder map.** A pixel map of the folders sits next to the terminal, with Pip standing wherever you are.
 - **World map, XP and badges.** Worlds unlock in order. Progress is saved in your browser.
+- **Practice your weak spots.** The game counts which commands trip you up (only the command name and a count, never what you typed) and offers a short practice round for them.
 - **Intro story.** A short pixel art cutscene about how Unix, GNU and Linux came to be.
 - **Break It sandbox.** Every command, a realistic pretend system and no rules. Try `rm -rf /` and see what happens (and find the secret badge).
 - **Break Room.** A tiny pixel arcade for a five minute break: Packet Snake, Bug Smash and Bit Breaker. Every game over screen has a true Linux tip.
 - **Accessible.** Real buttons and links, keyboard play, readable fonts, visible focus, works on phones and respects reduced motion.
+
+## Privacy
+
+Everything is saved only in your browser (`localStorage`): progress, XP, badges, high scores, settings and weak spots. Nothing is sent to a server, there are no accounts and no tracking. **Settings > Clear my saved data** deletes all of it.
 
 ## Run it locally
 

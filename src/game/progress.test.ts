@@ -19,7 +19,7 @@ const W1 = ['w1-l1-what-is-linux', 'w1-l2-distro-families', 'w1-l3-how-it-boots'
 function withCompleted(ids: string[]): Progress {
   const completed: Record<string, true> = {}
   for (const id of ids) completed[id] = true
-  return { version: 1, completed, introSeen: false, secrets: {} }
+  return { version: 1, completed, introSeen: false, secrets: {}, bonusXp: 0 }
 }
 
 describe('unlock rules', () => {

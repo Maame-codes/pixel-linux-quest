@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react'
 
 import { BREAK_CHOICES, NUDGE_CHOICES, useSetting } from '../arcade/settings'
+import { clearSavedData } from '../game/savedData'
 import { FeedbackLink } from './FeedbackLink'
 import styles from './SettingsMenu.module.css'
 
@@ -61,6 +62,56 @@ function Choice<T extends number>({
         ))}
       </div>
     </fieldset>
+  )
+}
+
+/** Wipes everything saved in this browser, after a confirm step (not a browser dialog). */
+function ClearData() {
+  const [stage, setStage] = useState<'idle' | 'confirm' | 'done'>('idle')
+  const confirmRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    if (stage === 'confirm') confirmRef.current?.focus()
+  }, [stage])
+
+  if (stage === 'confirm') {
+    return (
+      <div className={styles.confirm} role="group" aria-label="Clear my saved data">
+        <p className={styles.confirmText}>
+          This deletes your progress, XP, badges, high scores, settings and weak spots from this browser. It cannot be
+          undone.
+        </p>
+        <div className={styles.confirmRow}>
+          <button
+            ref={confirmRef}
+            type="button"
+            className={`${styles.action} ${styles.danger}`}
+            onClick={() => {
+              clearSavedData()
+              setStage('done')
+            }}
+          >
+            YES, DELETE IT
+          </button>
+          <button type="button" className={styles.action} onClick={() => setStage('idle')}>
+            CANCEL
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <>
+      <button type="button" className={styles.action} onClick={() => setStage('confirm')}>
+        CLEAR MY SAVED DATA
+      </button>
+      {stage === 'done' ? (
+        <p className={styles.unit} role="status">
+          All cleared. You are starting fresh.
+        </p>
+      ) : null}
+    </>
   )
 }
 
@@ -133,6 +184,8 @@ export function SettingsMenu() {
             {breakMinutes} minutes
           </p>
           <Toggle label="Sound" on={sound} onChange={setSound} />
+          <ClearData />
+          <p className={styles.privacy}>Everything is saved only in your browser. Nothing is sent to a server.</p>
           <FeedbackLink className={styles.feedback} />
         </div>
       ) : null}

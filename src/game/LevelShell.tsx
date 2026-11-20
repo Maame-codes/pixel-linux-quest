@@ -41,7 +41,7 @@ export function LevelShell({ level, children }: LevelShellProps) {
             <XPBar
               level={completedCount(progress)}
               value={earnedXp(progress)}
-              max={totalXp()}
+              max={totalXp(progress)}
             />
             <SettingsMenu />
           </div>

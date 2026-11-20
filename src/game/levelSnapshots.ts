@@ -25,3 +25,8 @@ export function loadSnapshot(levelId: string): LevelSnapshot | null {
 export function clearSnapshot(levelId: string): void {
   snapshots.delete(levelId)
 }
+
+/** Forget every unfinished run (used when saved data is cleared). */
+export function clearAllSnapshots(): void {
+  snapshots.clear()
+}

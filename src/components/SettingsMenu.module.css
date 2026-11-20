@@ -30,6 +30,8 @@
   top: calc(100% + 8px);
   z-index: 20;
   width: min(280px, calc(100vw - 32px));
+  max-height: calc(100vh - 96px);
+  overflow-y: auto;
   background: var(--panel);
   border: var(--border);
   box-shadow: var(--shadow);
@@ -126,5 +128,53 @@
 .unit {
   margin: -6px 0 0;
   font-size: 16px;
+  color: var(--soft-text);
+}
+
+.action {
+  min-height: 44px;
+  padding: 8px 10px;
+  font-family: var(--font-head);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--white);
+  background: var(--panel-2);
+  border: var(--border-thin);
+  cursor: pointer;
+  text-align: center;
+}
+
+.danger {
+  color: var(--deep);
+  background: var(--orange);
+}
+
+.confirm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: 10px;
+  background: var(--deep);
+  border: var(--border-thin);
+  border-color: var(--orange);
+}
+
+.confirmText {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--white);
+}
+
+.confirmRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.privacy {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.5;
   color: var(--soft-text);
 }

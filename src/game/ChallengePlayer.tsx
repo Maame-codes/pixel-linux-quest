@@ -10,6 +10,7 @@ import { useShellSession } from './useShellSession'
 import { LevelClear } from './LevelClear'
 import { clearSnapshot, loadSnapshot, saveSnapshot } from './levelSnapshots'
 import { TerminalWithMap } from './TerminalWithMap'
+import { mistakeCommand, recordMistake } from './weakSpots'
 import styles from './ChallengePlayer.module.css'
 
 const WELCOME = 'Welcome to Pip’s pocket terminal. Type help to see what you can do.'
@@ -75,7 +76,10 @@ export function ChallengePlayer({
 
   function handleSubmit(input: string) {
     const { result, before } = session.submit(input)
-    setMistake(explainMistake(input, result, before, { unlocked: test.commands, world }))
+    const explanation = explainMistake(input, result, before, { unlocked: test.commands, world })
+    setMistake(explanation)
+    const weak = mistakeCommand(input, result, explanation !== null, test.commands)
+    if (weak) recordMistake(weak)
     const next = doneRef.current.map(
       (d, i) => d || objectives[i].check(result.state, result),
     )

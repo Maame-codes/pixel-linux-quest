@@ -9,6 +9,7 @@ import { SandboxPage } from './pages/SandboxPage'
 import { BadgesPage } from './pages/BadgesPage'
 import { BreakRoomPage } from './pages/BreakRoomPage'
 import { NotFoundPage } from './pages/NotFoundPage'
+import { PracticePage } from './pages/PracticePage'
 import { useRememberPage } from './game/returnTo'
 
 export function App() {
@@ -24,6 +25,7 @@ export function App() {
         <Route path="/sandbox" element={<SandboxPage />} />
         <Route path="/badges" element={<BadgesPage />} />
         <Route path="/break" element={<BreakRoomPage />} />
+        <Route path="/practice" element={<PracticePage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </ProgressProvider>

@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from 'vitest'
 import type { ChallengeTest } from '../content/types'
 import { digAFolder } from '../content/levels/w2l4-dig-a-folder'
 import { ChallengePlayer } from './ChallengePlayer'
+import { loadWeakSpots } from './weakSpots'
 
 if (digAFolder.test.kind !== 'challenge') throw new Error('expected a challenge test')
 const challenge: ChallengeTest = digAFolder.test
@@ -41,6 +42,30 @@ describe('ChallengePlayer', () => {
 
     expect(screen.getByText(/LEVEL CLEAR/)).toBeInTheDocument()
     expect(onCompleted).toHaveBeenCalledTimes(1)
+  })
+
+  it('counts mistakes per command for weak spots, without saving what was typed', () => {
+    localStorage.clear()
+    render(
+      <MemoryRouter>
+        <ChallengePlayer
+          test={challenge}
+          world={2}
+          xp={50}
+          clearMessage="Nice work."
+          nextHref={null}
+          onReviewLesson={() => {}}
+          onCompleted={() => {}}
+        />
+      </MemoryRouter>,
+    )
+    type('cd secretplace')
+    type('cd..')
+    type('mkdir')
+    type('ls')
+    type('pancakes')
+    expect(loadWeakSpots()).toEqual({ cd: 2, mkdir: 1 })
+    expect(localStorage.getItem('plq.weakSpots')).not.toMatch(/secretplace|pancakes/)
   })
 
   it('shows a live folder map that follows Pip and can be hidden', () => {
