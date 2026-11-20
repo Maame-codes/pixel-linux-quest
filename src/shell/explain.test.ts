@@ -257,6 +257,16 @@ describe('explainMistake: World 3 commands', () => {
     expect(explain3('rm readonly.txt')).toContain('This terminal cannot answer questions')
   })
 
+  it('rm -i asking, which nobody can answer here', () => {
+    expect(explain3('rm -i a.txt')).toBe(
+      'With -i (or -I), rm asks before deleting. This terminal cannot answer questions, so nothing was deleted.',
+    )
+  })
+
+  it('several sources and a target that does not exist', () => {
+    expect(explain3('cp a.txt b.txt nodir')).toContain('the last name must be a folder')
+  })
+
   it('cp -i and mv -i asking before replacing a file', () => {
     expect(explain3('cp -i a.txt b.txt')).toContain('-i makes cp ask before replacing')
   })

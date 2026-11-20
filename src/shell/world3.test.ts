@@ -217,7 +217,12 @@ describe('cp', () => {
     )
     expect(run('cp nope.txt x').stderr).toBe("cp: cannot stat 'nope.txt': No such file or directory")
     expect(run('cp notes.txt notes.txt').stderr).toBe("cp: 'notes.txt' and 'notes.txt' are the same file")
-    expect(run('cp notes.txt run.sh empty.txt').stderr).toBe("cp: target 'empty.txt' is not a directory")
+    // Several sources: the target must be a directory (GNU coreutils 9.4 wording).
+    expect(run('cp notes.txt run.sh empty.txt').stderr).toBe("cp: target 'empty.txt': Not a directory")
+    expect(run('cp notes.txt run.sh nodir').stderr).toBe("cp: target 'nodir': No such file or directory")
+    expect(run('mv notes.txt run.sh empty.txt').stderr).toBe("mv: target 'empty.txt': Not a directory")
+    expect(run('mv notes.txt run.sh nodir').stderr).toBe("mv: target 'nodir': No such file or directory")
+    expect(run('cp notes.txt run.sh nodir').code).toBe(1)
     expect(run('cp -r docs docs/deep').stderr).toBe(
       "cp: cannot copy a directory, 'docs', into itself, 'docs/deep/docs'",
     )
@@ -247,6 +252,13 @@ describe('cp', () => {
     expect(run('cp -i notes.txt fresh.txt').stderr).toBe('')
     expect(run('cp -n notes.txt diary.txt').stderr).toBe('')
     expect(run('mv -i notes.txt diary.txt').stderr).toBe("mv: overwrite 'diary.txt'? ")
+  })
+
+  it('a declined -i question makes cp and mv exit with 1, but not when nothing needed asking', () => {
+    expect(run('cp -i notes.txt diary.txt').code).toBe(1)
+    expect(run('mv -i notes.txt diary.txt').code).toBe(1)
+    expect(run('cp -i notes.txt fresh.txt').code).toBe(0)
+    expect(run('mv -i notes.txt fresh.txt').code).toBe(0)
   })
 
   it('-v says what it copied', () => {
@@ -345,6 +357,31 @@ describe('rm with permissions', () => {
     const f = run('rm -f readonly.txt')
     expect(f.code).toBe(0)
     expect(node(f.state, '/home/pip/readonly.txt')).toBeNull()
+  })
+
+  it('rm -i asks about every file and keeps it; declined questions still exit 0', () => {
+    const r = run('rm -i notes.txt empty.txt')
+    expect(r.stderr).toBe("rm: remove regular file 'notes.txt'? \nrm: remove regular empty file 'empty.txt'? ")
+    expect(r.code).toBe(0)
+    expect(isFile(node(r.state, '/home/pip/notes.txt'))).toBe(true)
+    expect(run('rm -ri docs').stderr).toBe("rm: descend into directory 'docs'? ")
+    expect(run('rm -i readonly.txt').stderr).toBe("rm: remove write-protected regular file 'readonly.txt'? ")
+  })
+
+  it('rm -I asks once before a recursive or big delete', () => {
+    const r = run('rm -rI docs')
+    expect(r.stderr).toBe("rm: remove 1 argument recursively? ")
+    expect(r.code).toBe(0)
+    expect(isDir(node(r.state, '/home/pip/docs'))).toBe(true)
+    expect(run('rm -I notes.txt empty.txt run.sh log.txt').stderr).toBe('rm: remove 4 arguments? ')
+    // Three or fewer plain files: no question.
+    expect(run('rm -I notes.txt').code).toBe(0)
+    expect(node(run('rm -I notes.txt').state, '/home/pip/notes.txt')).toBeNull()
+  })
+
+  it('the last of -f and -i wins, as in GNU rm', () => {
+    expect(node(run('rm -if notes.txt').state, '/home/pip/notes.txt')).toBeNull()
+    expect(run('rm -fi notes.txt').stderr).toBe("rm: remove regular file 'notes.txt'? ")
   })
 
   it('rm -r deletes a whole tree it may write to', () => {
@@ -449,8 +486,13 @@ describe('find', () => {
     const s = createShellState({
       seedFs: dir({ home: dir({ pip: dir({ 'a.txt': file('a'), 'b.txt': file('b'), sub: dir({ 'c.txt': file('c') }) }) }) }),
     })
+    // Exactly as findutils 4.9.0 prints it: a backtick before the name, an apostrophe after.
     const r = runCommand(s, 'find . -name *.txt', ALL)
     expect(r.stderr).toBe("find: paths must precede expression: `b.txt'\nfind: possible unquoted pattern after predicate `-name'?")
+    expect(r.code).toBe(1)
+    expect(runCommand(s, 'find . -iname *.txt', ALL).stderr).toBe(
+      "find: paths must precede expression: `b.txt'\nfind: possible unquoted pattern after predicate `-iname'?",
+    )
     expect(runCommand(s, "find . -name '*.txt'", ALL).stdout).toBe('./a.txt\n./b.txt\n./sub/c.txt')
   })
 
@@ -517,6 +559,13 @@ describe('chmod', () => {
     expect(run('chmod 600').stderr).toBe("chmod: missing operand after ‘600’\nTry 'chmod --help' for more information.")
     expect(run('chmod abc notes.txt').stderr).toBe("chmod: invalid mode: ‘abc’\nTry 'chmod --help' for more information.")
     expect(run('chmod 600 nope').stderr).toBe("chmod: cannot access 'nope': No such file or directory")
+    // Invalid mode and missing operand both end with the "Try" line.
+    for (const line of ['chmod', 'chmod 600', 'chmod abc notes.txt', 'chmod u+q notes.txt']) {
+      const lines = run(line).stderr.split('\n')
+      expect(lines, line).toHaveLength(2)
+      expect(lines[1], line).toBe("Try 'chmod --help' for more information.")
+      expect(run(line).code, line).toBe(1)
+    }
   })
 
   it('only the owner (or root) may change permissions', () => {

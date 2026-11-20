@@ -23,10 +23,15 @@ export function planTransfer(cmd: string, operands: string[], state: ShellState)
   }
   const dest = operands[operands.length - 1]
   const destAbs = resolvePath(state.cwd, dest, state.home)
-  const destNode = lookup(state, destAbs).node
+  const destFound = lookup(state, destAbs)
+  const destNode = destFound.node
   const intoDir = isDir(destNode)
   const sources = operands.slice(0, -1).map((shown) => ({ shown, abs: resolvePath(state.cwd, shown, state.home) }))
-  if (sources.length > 1 && !intoDir) return { error: `${cmd}: target '${dest}' is not a directory` }
+  if (sources.length > 1 && !intoDir) {
+    // As GNU coreutils 9.4 prints it: the reason the target cannot be used as a directory.
+    const why = destFound.error ? ERRNO_TEXT[destFound.error] : ERRNO_TEXT.ENOTDIR
+    return { error: `${cmd}: target '${dest}': ${why}` }
+  }
   return {
     sources,
     targetFor: (src) =>
@@ -181,7 +186,8 @@ export const cp: Command = {
       state,
       stdout: ctx.said.join('\n') || undefined,
       stderr: [...ctx.asked, ...ctx.errors].join('\n') || undefined,
-      code: ctx.errors.length > 0 ? 1 : 0,
+      // A declined -i question (nobody can answer here) also makes cp exit with 1.
+      code: ctx.errors.length > 0 || ctx.asked.length > 0 ? 1 : 0,
     }
   },
 }

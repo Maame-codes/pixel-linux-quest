@@ -103,7 +103,8 @@ export const mv: Command = {
       state,
       stdout: said.join('\n') || undefined,
       stderr: [...asked, ...errors].join('\n') || undefined,
-      code: errors.length > 0 ? 1 : 0,
+      // A declined -i question (nobody can answer here) also makes mv exit with 1.
+      code: errors.length > 0 || asked.length > 0 ? 1 : 0,
     }
   },
 }

@@ -97,7 +97,8 @@ export function analyzeDanger(line: string, state: ShellState): Danger | null {
   if (words[0] !== 'rm') return null
 
   const opts = parseRmArgs(words.slice(1))
-  if (opts.error || !opts.recursive) return null
+  // With -i or -I, rm asks first, and nobody can answer here: nothing is deleted.
+  if (opts.error || !opts.recursive || opts.interactive === 'always' || opts.interactive === 'once') return null
 
   const targets = opts.operands.map((op) => resolvePath(state.cwd, op, state.home))
   if (targets.includes('/')) {

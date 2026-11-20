@@ -96,6 +96,12 @@ describe('analyzeDanger', () => {
   ])('%s wipes the system', (line) => {
     expect(analyzeDanger(line, s)).toEqual({ kind: 'wipe', sudo: false })
   })
+  it.each(['rm -rfi --no-preserve-root /', 'rm -rI /*', 'rm -fi -r /etc'])(
+    '%s asks first (and nobody can answer), so it is not a wipe',
+    (line) => {
+      expect(analyzeDanger(line, s)).toBeNull()
+    },
+  )
   it.each(['rm -rf docs', 'rm -rf ~', 'rm /', "rm -rf '/*'", 'rm -f /etc', 'ls /'])(
     '%s is not a system wipe',
     (line) => {

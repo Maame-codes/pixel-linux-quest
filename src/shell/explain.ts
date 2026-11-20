@@ -154,8 +154,11 @@ export function explainMistake(
     return 'cat needs a file name after it. With no name, a real cat waits for you to type, until you press Ctrl+D.'
   }
 
-  // rm asked about a write-protected file; the terminal cannot answer, so it kept it.
-  if (name === 'rm' && err.includes('remove write-protected')) {
+  // rm asked a question; the terminal cannot answer, so nothing was deleted.
+  if (name === 'rm' && /^rm: (remove|descend into) .*\? $/m.test(err)) {
+    if (args.some((a) => /^-[a-zA-Z]*[iI]/.test(a))) {
+      return 'With -i (or -I), rm asks before deleting. This terminal cannot answer questions, so nothing was deleted.'
+    }
     return 'rm asks before deleting a file you have no w (write) permission for. This terminal cannot answer questions, so the file was kept. Adding -f skips the question.'
   }
 
@@ -299,7 +302,7 @@ export function explainMistake(
   if (/into itself|subdirectory of itself/.test(err)) {
     return 'A folder cannot go inside itself. Pick a destination outside it.'
   }
-  if ((name === 'cp' || name === 'mv') && err.includes('is not a directory')) {
+  if ((name === 'cp' || name === 'mv') && /target '[^']*': (No such file or directory|Not a directory)/.test(err)) {
     return `With more than one name to ${name === 'cp' ? 'copy' : 'move'}, the last name must be a folder for them all to go into.`
   }
   if (/cannot overwrite (non-)?directory/.test(err)) {

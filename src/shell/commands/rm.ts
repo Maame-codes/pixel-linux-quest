@@ -3,9 +3,20 @@ import { basename, dirname, resolvePath } from '../path'
 import { ERRNO_TEXT, isRoot, lookup, permits, touched, unlinkError } from '../perm'
 import { isDir, type Command, type DirNode, type FsNode, type ShellState } from '../types'
 
+/**
+ * When rm asks before deleting, as in GNU rm (the last of -f, -i and -I wins):
+ * - never: -f, never asks.
+ * - sometimes: the default, asks only about write-protected files.
+ * - once: -I, asks once before removing more than 3 names or anything recursively.
+ * - always: -i, asks about every file and directory.
+ */
+export type RmInteractive = 'never' | 'sometimes' | 'once' | 'always'
+
 export type RmArgs = {
   recursive: boolean
+  /** -f: no error for a missing file. */
   force: boolean
+  interactive: RmInteractive
   /** -d: remove empty directories. */
   emptyDirs: boolean
   verbose: boolean
@@ -26,11 +37,26 @@ export function parseRmArgs(args: string[]): RmArgs {
   const out: RmArgs = {
     recursive: false,
     force: false,
+    interactive: 'sometimes',
     emptyDirs: false,
     verbose: false,
     preserveRoot: true,
     operands: [],
   }
+  const set = (flag: string) => {
+    if (flag === 'r' || flag === 'R') out.recursive = true
+    else if (flag === 'f') {
+      out.force = true
+      out.interactive = 'never'
+    } else if (flag === 'i' || flag === 'I') {
+      out.force = false
+      out.interactive = flag === 'i' ? 'always' : 'once'
+    } else if (flag === 'd') out.emptyDirs = true
+    else if (flag === 'v') out.verbose = true
+    else return false
+    return true
+  }
+  const LONG: Record<string, string> = { '--recursive': 'r', '--force': 'f', '--dir': 'd', '--verbose': 'v' }
   let optionsDone = false
   for (const arg of args) {
     if (optionsDone || arg === '-' || !arg.startsWith('-')) {
@@ -42,37 +68,14 @@ export function parseRmArgs(args: string[]): RmArgs {
       continue
     }
     if (arg.startsWith('--')) {
-      switch (arg) {
-        case '--recursive':
-          out.recursive = true
-          break
-        case '--force':
-          out.force = true
-          break
-        case '--dir':
-          out.emptyDirs = true
-          break
-        case '--verbose':
-          out.verbose = true
-          break
-        case '--no-preserve-root':
-          out.preserveRoot = false
-          break
-        case '--preserve-root':
-          out.preserveRoot = true
-          break
-        default:
-          out.error ??= `rm: unrecognized option '${arg}'\n${TRY}`
-      }
+      if (arg === '--no-preserve-root') out.preserveRoot = false
+      else if (arg === '--preserve-root') out.preserveRoot = true
+      else if (LONG[arg]) set(LONG[arg])
+      else out.error ??= `rm: unrecognized option '${arg}'\n${TRY}`
       continue
     }
     for (const flag of arg.slice(1)) {
-      if (flag === 'r' || flag === 'R') out.recursive = true
-      else if (flag === 'f') out.force = true
-      else if (flag === 'd') out.emptyDirs = true
-      else if (flag === 'v') out.verbose = true
-      else if (flag === 'i' || flag === 'I') continue
-      else out.error ??= `rm: invalid option -- '${flag}'\n${TRY}`
+      if (!set(flag)) out.error ??= `rm: invalid option -- '${flag}'\n${TRY}`
     }
   }
   return out
@@ -86,13 +89,35 @@ export function isRootOperand(state: ShellState, operand: string): boolean {
 type RemoveCtx = {
   state: ShellState
   opts: RmArgs
-  errors: string[]
+  /** Everything rm prints to stderr, in order: errors and its questions. */
+  stderr: string[]
   said: string[]
+  /** A real error happened (a question nobody answered is not one). */
+  failed: boolean
 }
 
-/** rm without -f asks before deleting a file you may not write to. */
+function fail(ctx: RemoveCtx, message: string): void {
+  ctx.stderr.push(message)
+  ctx.failed = true
+}
+
+/**
+ * rm's question before deleting. This terminal cannot answer, so the answer
+ * is always no: the file stays, and that is not an error.
+ */
+function ask(ctx: RemoveCtx, question: string): void {
+  ctx.stderr.push(`rm: ${question}? `)
+}
+
 function writeProtected(ctx: RemoveCtx, abs: string, node: FsNode): boolean {
-  return !ctx.opts.force && !isRoot(ctx.state) && !isDir(node) && !permits(ctx.state, abs, node, 'w')
+  return !isRoot(ctx.state) && !permits(ctx.state, abs, node, 'w')
+}
+
+/** "regular file", "regular empty file" or "directory", with "write-protected" in front if so. */
+function describe(ctx: RemoveCtx, abs: string, node: FsNode): string {
+  const wp = writeProtected(ctx, abs, node) ? 'write-protected ' : ''
+  if (isDir(node)) return `${wp}directory`
+  return `${wp}regular ${node.content === '' ? 'empty ' : ''}file`
 }
 
 /**
@@ -100,10 +125,15 @@ function writeProtected(ctx: RemoveCtx, abs: string, node: FsNode): boolean {
  * everything inside it first. Returns true if it is gone.
  */
 function removeTree(ctx: RemoveCtx, parentAbs: string, parent: DirNode, abs: string, shown: string, node: FsNode): boolean {
+  const always = ctx.opts.interactive === 'always'
   if (isDir(node)) {
     const names = listDir(node)
+    if (names.length > 0 && always) {
+      ask(ctx, `descend into ${writeProtected(ctx, abs, node) ? 'write-protected ' : ''}directory '${shown}'`)
+      return false
+    }
     if (names.length > 0 && !(permits(ctx.state, abs, node, 'r') && permits(ctx.state, abs, node, 'x'))) {
-      ctx.errors.push(`rm: cannot remove '${shown}': Permission denied`)
+      fail(ctx, `rm: cannot remove '${shown}': Permission denied`)
       return false
     }
     let allGone = true
@@ -115,14 +145,14 @@ function removeTree(ctx: RemoveCtx, parentAbs: string, parent: DirNode, abs: str
     if (!allGone) return false
   }
   if (abs === '/') return true
-  if (writeProtected(ctx, abs, node)) {
-    const empty = node.kind === 'file' && node.content === '' ? 'empty ' : ''
-    ctx.errors.push(`rm: remove write-protected regular ${empty}file '${shown}'? `)
+  const sometimes = ctx.opts.interactive === 'sometimes' || ctx.opts.interactive === 'once'
+  if (always || (sometimes && !isDir(node) && writeProtected(ctx, abs, node))) {
+    ask(ctx, `remove ${describe(ctx, abs, node)} '${shown}'`)
     return false
   }
   const e = unlinkError(ctx.state, parentAbs, parent, abs, node)
   if (e) {
-    ctx.errors.push(`rm: cannot remove '${shown}': ${ERRNO_TEXT[e]}`)
+    fail(ctx, `rm: cannot remove '${shown}': ${ERRNO_TEXT[e]}`)
     return false
   }
   delete parent.children[basename(abs)]
@@ -134,9 +164,9 @@ function removeTree(ctx: RemoveCtx, parentAbs: string, parent: DirNode, abs: str
 export const rm: Command = {
   name: 'rm',
   summary: 'remove files or directories',
-  usage: 'rm [-r] [-f] FILE...',
+  usage: 'rm [-r] [-f] [-i] FILE...',
   description:
-    'Deletes files for good: there is no recycle bin. Add -r to delete a directory and everything inside it. -f skips missing files without an error, and does not ask about write-protected files.',
+    'Deletes files for good: there is no recycle bin. Add -r to delete a directory and everything inside it. -f skips missing files without an error, and never asks. -i asks before every deletion.',
   run: ({ args, state }) => {
     const opts = parseRmArgs(args)
     if (opts.error) return { stderr: opts.error, code: 1 }
@@ -145,59 +175,57 @@ export const rm: Command = {
       return { stderr: `rm: missing operand\n${TRY}`, code: 1 }
     }
 
-    const ctx: RemoveCtx = { state, opts, errors: [], said: [] }
-    // A write-protected file that rm asked about (and this terminal could not answer) is not a failure.
-    let failed = false
+    const ctx: RemoveCtx = { state, opts, stderr: [], said: [], failed: false }
+
+    // -I asks once before a big or recursive delete. Unanswered, nothing is removed.
+    const n = opts.operands.length
+    if (opts.interactive === 'once' && (opts.recursive || n > 3)) {
+      const what = `${n} argument${n === 1 ? '' : 's'}`
+      ask(ctx, opts.recursive ? `remove ${what} recursively` : `remove ${what}`)
+      return { state, stderr: ctx.stderr.join('\n'), code: 0 }
+    }
+
     for (const op of opts.operands) {
       const abs = resolvePath(state.cwd, op, state.home)
       const last = op.replace(/\/+$/, '').split('/').pop()
 
       if (opts.recursive && abs === '/' && opts.preserveRoot) {
         const same = op === '/' ? "'/'" : `'${op}' (same as '/')`
-        ctx.errors.push(`rm: it is dangerous to operate recursively on ${same}`)
-        ctx.errors.push('rm: use --no-preserve-root to override this failsafe')
-        failed = true
+        fail(ctx, `rm: it is dangerous to operate recursively on ${same}`)
+        ctx.stderr.push('rm: use --no-preserve-root to override this failsafe')
         continue
       }
       if (opts.recursive && (last === '.' || last === '..')) {
-        ctx.errors.push(`rm: refusing to remove '.' or '..' directory: skipping '${op}'`)
-        failed = true
+        fail(ctx, `rm: refusing to remove '.' or '..' directory: skipping '${op}'`)
         continue
       }
 
       const found = lookup(state, abs)
       if (found.error) {
-        if (!(opts.force && found.error === 'ENOENT')) {
-          ctx.errors.push(`rm: cannot remove '${op}': ${ERRNO_TEXT[found.error]}`)
-          failed = true
-        }
+        if (!(opts.force && found.error === 'ENOENT')) fail(ctx, `rm: cannot remove '${op}': ${ERRNO_TEXT[found.error]}`)
         continue
       }
       const node = found.node
       if (isDir(node) && !opts.recursive) {
         if (!opts.emptyDirs) {
-          ctx.errors.push(`rm: cannot remove '${op}': Is a directory`)
-          failed = true
+          fail(ctx, `rm: cannot remove '${op}': Is a directory`)
           continue
         }
         if (Object.keys(node.children).length > 0) {
-          ctx.errors.push(`rm: cannot remove '${op}': Directory not empty`)
-          failed = true
+          fail(ctx, `rm: cannot remove '${op}': Directory not empty`)
           continue
         }
       }
       const parentAbs = dirname(abs)
       const parent = abs === '/' ? state.fs : (lookup(state, parentAbs).node as DirNode)
-      const before = ctx.errors.length
-      const gone = removeTree(ctx, parentAbs, parent, abs, op, node)
-      if (!gone && ctx.errors.slice(before).some((e) => !e.includes('remove write-protected'))) failed = true
+      removeTree(ctx, parentAbs, parent, abs, op, node)
     }
 
     return {
       state,
       stdout: ctx.said.join('\n') || undefined,
-      stderr: ctx.errors.join('\n') || undefined,
-      code: failed ? 1 : 0,
+      stderr: ctx.stderr.join('\n') || undefined,
+      code: ctx.failed ? 1 : 0,
     }
   },
 }
