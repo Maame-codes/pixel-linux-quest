@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { BREAK_MS } from '../arcade/breakTimer'
+import { reloadSettings, setSetting } from '../arcade/settings'
 import { ProgressProvider } from '../game/ProgressContext'
 import { rememberPage } from '../game/returnTo'
 import { BreakRoomPage } from './BreakRoomPage'
@@ -22,7 +22,10 @@ function renderRoom() {
 }
 
 describe('BreakRoomPage', () => {
-  beforeEach(() => localStorage.clear())
+  beforeEach(() => {
+    localStorage.clear()
+    reloadSettings()
+  })
   afterEach(() => vi.useRealTimers())
 
   it('shows the arcade scene, a clock and the games as buttons', () => {
@@ -46,20 +49,28 @@ describe('BreakRoomPage', () => {
     expect(screen.getByText('level page')).toBeInTheDocument()
   })
 
-  it('asks "Ready to jump back in?" when time is up, with +2 MINUTES once', () => {
+  it('asks "Ready to jump back in?" when time is up, and STAY A BIT LONGER works every time', () => {
     vi.useFakeTimers()
     renderRoom()
     act(() => {
-      vi.advanceTimersByTime(BREAK_MS)
+      vi.advanceTimersByTime(5 * 60 * 1000)
     })
+    for (let i = 0; i < 3; i++) {
+      expect(screen.getByText('Ready to jump back in?')).toBeInTheDocument()
+      fireEvent.click(screen.getByRole('button', { name: 'STAY A BIT LONGER' }))
+      expect(screen.queryByText('Ready to jump back in?')).not.toBeInTheDocument()
+      expect(screen.getByRole('timer')).toHaveTextContent('2:00')
+      act(() => {
+        vi.advanceTimersByTime(2 * 60 * 1000)
+      })
+    }
     expect(screen.getByText('Ready to jump back in?')).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: '+2 MINUTES' }))
-    expect(screen.queryByText('Ready to jump back in?')).not.toBeInTheDocument()
-    expect(screen.getByRole('timer')).toHaveTextContent('2:00')
-    act(() => {
-      vi.advanceTimersByTime(2 * 60 * 1000)
-    })
-    expect(screen.getByText('Ready to jump back in?')).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: '+2 MINUTES' })).not.toBeInTheDocument()
+  })
+
+  it('uses the break length from settings', () => {
+    setSetting('breakMinutes', 3)
+    renderRoom()
+    expect(screen.getByRole('timer')).toHaveTextContent('3:00')
+    expect(screen.getByText(/A 3 minute breather/)).toBeInTheDocument()
   })
 })

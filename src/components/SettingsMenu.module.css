@@ -85,3 +85,46 @@
   line-height: 1.5;
   color: var(--cyan);
 }
+
+.choice {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.choiceLabel {
+  padding: 0;
+  margin-bottom: 6px;
+  font-size: 18px;
+  color: var(--white);
+}
+
+.choiceRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.choiceBtn {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 8px;
+  font-family: var(--font-head);
+  font-size: 12px;
+  color: var(--soft-text);
+  background: var(--deep);
+  border: var(--border-thin);
+  cursor: pointer;
+}
+
+.choiceBtn.on {
+  color: var(--deep);
+  background: var(--lime);
+}
+
+.unit {
+  margin: -6px 0 0;
+  font-size: 16px;
+  color: var(--soft-text);
+}

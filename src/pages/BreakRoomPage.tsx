@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom'
 import { ARCADE_GAMES, type ArcadeGame } from '../arcade/games'
 import { getHighScore } from '../arcade/highScores'
 import {
-  canExtend,
   extendBreak,
   formatClock,
   isBreakOver,
@@ -12,6 +11,7 @@ import {
   tickBreak,
   type BreakTimer,
 } from '../arcade/breakTimer'
+import { getSettings } from '../arcade/settings'
 import { Page } from '../components/Page'
 import { Pip } from '../components/Pip'
 import { PixelButton } from '../components/PixelButton'
@@ -37,7 +37,9 @@ function ClockIcon() {
 export function BreakRoomPage() {
   const navigate = useNavigate()
   const { progress } = useProgress()
-  const [timer, setTimer] = useState<BreakTimer>(newBreak)
+  // The length is read once: changing it mid-break applies to the next break.
+  const [minutes] = useState(() => getSettings().breakMinutes)
+  const [timer, setTimer] = useState<BreakTimer>(() => newBreak(minutes))
   const [open, setOpen] = useState<ArcadeGame | null>(null)
   const [roundRunning, setRoundRunning] = useState(false)
   const [, setScoresVersion] = useState(0)
@@ -78,13 +80,12 @@ export function BreakRoomPage() {
       <Pip size={56} />
       <div className={styles.promptBody}>
         <p className={styles.promptText}>Ready to jump back in?</p>
+        <p className={styles.promptSub}>Or stay a bit longer: each tap adds 2 minutes.</p>
         <div className={styles.promptButtons}>
           <PixelButton onClick={backToQuest}>BACK TO MY QUEST</PixelButton>
-          {canExtend(timer) ? (
-            <PixelButton variant="secondary" onClick={() => setTimer(extendBreak)}>
-              +2 MINUTES
-            </PixelButton>
-          ) : null}
+          <PixelButton variant="secondary" onClick={() => setTimer(extendBreak)}>
+            STAY A BIT LONGER
+          </PixelButton>
         </div>
       </div>
     </div>
@@ -108,7 +109,7 @@ export function BreakRoomPage() {
       </div>
 
       <p className={styles.lead}>
-        A five minute breather. Play a round or two, then hop back into your quest. Your progress is safe.
+        A {minutes} minute breather. Play a round or two, then hop back into your quest. Your progress is safe.
       </p>
 
       {showPrompt ? prompt : null}

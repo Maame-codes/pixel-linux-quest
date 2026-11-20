@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -6,7 +6,7 @@ import { reloadSettings, setSetting } from '../arcade/settings'
 import { SettingsMenu } from '../components/SettingsMenu'
 import { BreakNudge } from './BreakNudge'
 import {
-  NUDGE_EVERY_MS,
+  MINUTE_MS,
   addActive,
   isQuiet,
   newNudgeClock,
@@ -42,16 +42,22 @@ const minutes = (m: number) =>
   })
 
 describe('nudge clock', () => {
-  it('is due after 20 minutes of active time', () => {
-    const c = addActive(newNudgeClock(), NUDGE_EVERY_MS - 1)
-    expect(nudgeDue(c)).toBe(false)
-    expect(nudgeDue(addActive(c, 1))).toBe(true)
+  it('is due after the chosen number of minutes of active time', () => {
+    const c = addActive(newNudgeClock(), 20 * MINUTE_MS - 1)
+    expect(nudgeDue(c, 20)).toBe(false)
+    expect(nudgeDue(addActive(c, 1), 20)).toBe(true)
+    expect(nudgeDue(c, 15)).toBe(true)
+    expect(nudgeDue(addActive(c, 1), 30)).toBe(false)
   })
 
-  it('NOT NOW waits another 20 minutes', () => {
-    const c = snooze(addActive(newNudgeClock(), NUDGE_EVERY_MS))
-    expect(nudgeDue(c)).toBe(false)
-    expect(nudgeDue(addActive(c, NUDGE_EVERY_MS))).toBe(true)
+  it('is never due when reminders are off', () => {
+    expect(nudgeDue(addActive(newNudgeClock(), 999 * MINUTE_MS), 0)).toBe(false)
+  })
+
+  it('NOT NOW waits another full interval', () => {
+    const c = snooze(addActive(newNudgeClock(), 45 * MINUTE_MS))
+    expect(nudgeDue(c, 45)).toBe(false)
+    expect(nudgeDue(addActive(c, 45 * MINUTE_MS), 45)).toBe(true)
   })
 
   it('waits for a quiet moment after typing', () => {
@@ -110,8 +116,17 @@ describe('BreakNudge', () => {
     expect(screen.queryByText(MESSAGE)).not.toBeInTheDocument()
   })
 
-  it('stays away when nudges are turned off', () => {
-    setSetting('nudges', false)
+  it('follows the chosen interval', () => {
+    setSetting('nudgeMinutes', 15)
+    renderNudge()
+    minutes(14)
+    expect(screen.queryByText(MESSAGE)).not.toBeInTheDocument()
+    minutes(1.5)
+    expect(screen.getByText(MESSAGE)).toBeInTheDocument()
+  })
+
+  it('stays away when reminders are Off', () => {
+    setSetting('nudgeMinutes', 0)
     renderNudge()
     minutes(45)
     expect(screen.queryByText(MESSAGE)).not.toBeInTheDocument()
@@ -124,16 +139,23 @@ describe('SettingsMenu', () => {
     reloadSettings()
   })
 
-  it('the gear opens switches for nudges and sound, remembered in localStorage', () => {
+  it('the gear opens reminder, break length and sound settings, remembered in localStorage', () => {
     render(<SettingsMenu />)
     fireEvent.click(screen.getByRole('button', { name: 'Settings' }))
-    const nudges = screen.getByRole('switch', { name: /Break nudges/ })
+    const reminder = screen.getByRole('group', { name: 'Break reminder every' })
+    const length = screen.getByRole('group', { name: 'Break length' })
     const sound = screen.getByRole('switch', { name: /Sound/ })
-    expect(nudges).toHaveAttribute('aria-checked', 'true')
+    expect(within(reminder).getByRole('button', { name: '20 minutes' })).toHaveAttribute('aria-pressed', 'true')
+    expect(within(length).getByRole('button', { name: '5 minutes' })).toHaveAttribute('aria-pressed', 'true')
     expect(sound).toHaveAttribute('aria-checked', 'false')
-    fireEvent.click(nudges)
+    fireEvent.click(within(reminder).getByRole('button', { name: 'Off' }))
+    fireEvent.click(within(length).getByRole('button', { name: '10 minutes' }))
     fireEvent.click(sound)
-    expect(JSON.parse(localStorage.getItem('plq.settings') ?? '{}')).toEqual({ sound: true, nudges: false })
+    expect(JSON.parse(localStorage.getItem('plq.settings') ?? '{}')).toEqual({
+      sound: true,
+      nudgeMinutes: 0,
+      breakMinutes: 10,
+    })
     fireEvent.keyDown(window, { key: 'Escape' })
     expect(screen.queryByRole('switch', { name: /Sound/ })).not.toBeInTheDocument()
   })

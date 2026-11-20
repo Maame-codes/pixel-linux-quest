@@ -4,25 +4,48 @@ import { useSyncExternalStore } from 'react'
 // localStorage. Storage can be blocked (private mode), so every access is
 // wrapped and the defaults are used instead.
 
+export const NUDGE_CHOICES = [15, 20, 30, 45, 0] as const
+export const BREAK_CHOICES = [3, 5, 10] as const
+
+/** Minutes of level time between break reminders. 0 means Off. */
+export type NudgeMinutes = (typeof NUDGE_CHOICES)[number]
+/** Length of a Break Room break, in minutes. */
+export type BreakMinutes = (typeof BREAK_CHOICES)[number]
+
 export type Settings = {
   /** 8-bit sound effects in the Break Room games. Off by default. */
   sound: boolean
-  /** Pip's "want a quick break?" nudges during levels. On by default. */
-  nudges: boolean
+  /** Pip's "want a quick break?" reminder, every N minutes in levels. 0 = Off. */
+  nudgeMinutes: NudgeMinutes
+  /** How long a break in the Break Room lasts. */
+  breakMinutes: BreakMinutes
 }
 
 const KEY = 'plq.settings'
-export const DEFAULT_SETTINGS: Settings = { sound: false, nudges: true }
+export const DEFAULT_SETTINGS: Settings = { sound: false, nudgeMinutes: 20, breakMinutes: 5 }
+
+function pick<T>(choices: readonly T[], value: unknown, fallback: T): T {
+  return choices.includes(value as T) ? (value as T) : fallback
+}
+
+/** Turn whatever is saved (maybe an older version) into valid settings. */
+export function parseSettings(raw: unknown): Settings {
+  const p = (typeof raw === 'object' && raw !== null ? raw : {}) as Record<string, unknown>
+  let nudgeMinutes = pick(NUDGE_CHOICES, p.nudgeMinutes, DEFAULT_SETTINGS.nudgeMinutes)
+  // Older saves had an on/off switch called "nudges". Off stays off.
+  if (p.nudgeMinutes === undefined && p.nudges === false) nudgeMinutes = 0
+  return {
+    sound: typeof p.sound === 'boolean' ? p.sound : DEFAULT_SETTINGS.sound,
+    nudgeMinutes,
+    breakMinutes: pick(BREAK_CHOICES, p.breakMinutes, DEFAULT_SETTINGS.breakMinutes),
+  }
+}
 
 export function loadSettings(): Settings {
   try {
     const raw = localStorage.getItem(KEY)
     if (!raw) return { ...DEFAULT_SETTINGS }
-    const parsed = JSON.parse(raw) as Partial<Settings> | null
-    return {
-      sound: typeof parsed?.sound === 'boolean' ? parsed.sound : DEFAULT_SETTINGS.sound,
-      nudges: typeof parsed?.nudges === 'boolean' ? parsed.nudges : DEFAULT_SETTINGS.nudges,
-    }
+    return parseSettings(JSON.parse(raw))
   } catch {
     return { ...DEFAULT_SETTINGS }
   }
@@ -49,7 +72,7 @@ export function setSetting<K extends keyof Settings>(key: K, value: Settings[K])
   save({ ...current, [key]: value })
 }
 
-/** Re-read storage (used by tests after they clear it). */
+/** Re-read storage (used by tests and after clearing saved data). */
 export function reloadSettings(): void {
   current = loadSettings()
   listeners.forEach((l) => l())

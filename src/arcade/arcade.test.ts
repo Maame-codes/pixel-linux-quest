@@ -1,33 +1,36 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
-import { BREAK_MS, EXTRA_MS, canExtend, extendBreak, formatClock, isBreakOver, newBreak, tickBreak } from './breakTimer'
+import { EXTRA_MS, MINUTE_MS, extendBreak, formatClock, isBreakOver, newBreak, tickBreak } from './breakTimer'
 import { getHighScore, recordScore } from './highScores'
 import { controlForKey, isPauseKey, swipeDirection } from './input'
 import { nextRandom, randomInt } from './random'
-import { getSettings, reloadSettings, setSetting } from './settings'
+import { getSettings, parseSettings, reloadSettings, setSetting } from './settings'
 
 describe('break timer', () => {
-  it('runs for five minutes', () => {
-    let t = newBreak()
-    expect(t.remainingMs).toBe(BREAK_MS)
-    t = tickBreak(t, BREAK_MS - 1000)
+  it('runs for the chosen number of minutes', () => {
+    let t = newBreak(5)
+    expect(t.remainingMs).toBe(5 * MINUTE_MS)
+    t = tickBreak(t, 5 * MINUTE_MS - 1000)
     expect(isBreakOver(t)).toBe(false)
     t = tickBreak(t, 5000)
     expect(t.remainingMs).toBe(0)
     expect(isBreakOver(t)).toBe(true)
+    expect(newBreak(3).remainingMs).toBe(3 * MINUTE_MS)
+    expect(newBreak(10).remainingMs).toBe(10 * MINUTE_MS)
   })
 
-  it('+2 minutes works once per break', () => {
-    let t = tickBreak(newBreak(), BREAK_MS)
-    expect(canExtend(t)).toBe(true)
-    t = extendBreak(t)
-    expect(t.remainingMs).toBe(EXTRA_MS)
-    expect(canExtend(t)).toBe(false)
-    expect(extendBreak(t)).toBe(t)
+  it('+2 minutes can be added again and again', () => {
+    let t = tickBreak(newBreak(5), 5 * MINUTE_MS)
+    for (let i = 1; i <= 4; i++) {
+      t = extendBreak(t)
+      expect(t.remainingMs).toBe(EXTRA_MS)
+      t = tickBreak(t, EXTRA_MS)
+      expect(isBreakOver(t)).toBe(true)
+    }
   })
 
   it('formats the clock', () => {
-    expect(formatClock(BREAK_MS)).toBe('5:00')
+    expect(formatClock(5 * MINUTE_MS)).toBe('5:00')
     expect(formatClock(65_000)).toBe('1:05')
     expect(formatClock(400)).toBe('0:01')
     expect(formatClock(0)).toBe('0:00')
@@ -57,8 +60,24 @@ describe('settings', () => {
     reloadSettings()
   })
 
-  it('sound is off and nudges are on by default', () => {
-    expect(getSettings()).toEqual({ sound: false, nudges: true })
+  it('sound is off, reminders every 20 minutes and 5 minute breaks by default', () => {
+    expect(getSettings()).toEqual({ sound: false, nudgeMinutes: 20, breakMinutes: 5 })
+  })
+
+  it('migrates the old on/off nudge switch', () => {
+    localStorage.setItem('plq.settings', JSON.stringify({ sound: true, nudges: false }))
+    reloadSettings()
+    expect(getSettings()).toEqual({ sound: true, nudgeMinutes: 0, breakMinutes: 5 })
+    expect(parseSettings({ nudges: true }).nudgeMinutes).toBe(20)
+  })
+
+  it('ignores values that are not one of the choices', () => {
+    expect(parseSettings({ nudgeMinutes: 7, breakMinutes: 60 })).toEqual({
+      sound: false,
+      nudgeMinutes: 20,
+      breakMinutes: 5,
+    })
+    expect(parseSettings(null).breakMinutes).toBe(5)
   })
 
   it('remembers changes', () => {

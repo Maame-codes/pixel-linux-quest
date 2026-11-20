@@ -24,13 +24,15 @@ function typingSomething(): boolean {
 }
 
 /**
- * Counts active time in a level and, after 20 minutes, shows a small
+ * Counts active time in a level and, after the chosen number of minutes
+ * (20 by default, set in the settings panel), shows a small
  * message from Pip. It sits in the page flow above the level (never over
  * the terminal) and only appears while the learner is not typing.
  */
 export function BreakNudge() {
   const navigate = useNavigate()
-  const [enabled] = useSetting('nudges')
+  const [everyMinutes] = useSetting('nudgeMinutes')
+  const enabled = everyMinutes > 0
   const [show, setShow] = useState(false)
   const lastKey = useRef(Date.now())
 
@@ -43,7 +45,7 @@ export function BreakNudge() {
       if (document.hidden) return
       const clock = addActive(getNudgeClock(), TICK_MS)
       setNudgeClock(clock)
-      if (enabled && nudgeDue(clock) && isQuiet(lastKey.current, Date.now()) && !typingSomething()) {
+      if (nudgeDue(clock, everyMinutes) && isQuiet(lastKey.current, Date.now()) && !typingSomething()) {
         setShow(true)
       }
     }, TICK_MS)
@@ -51,7 +53,7 @@ export function BreakNudge() {
       window.removeEventListener('keydown', onKey)
       window.clearInterval(id)
     }
-  }, [enabled])
+  }, [everyMinutes])
 
   if (!show || !enabled) return null
 

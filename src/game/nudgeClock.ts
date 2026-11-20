@@ -2,32 +2,34 @@
 // (only while the tab is visible) and says when a nudge is due. Pure
 // functions plus a small in-memory store shared by every level page.
 
-export const NUDGE_EVERY_MS = 20 * 60 * 1000
+export const MINUTE_MS = 60 * 1000
 /** Wait this long after the last key press, so the nudge never lands mid-command. */
 export const QUIET_MS = 5000
 
 export type NudgeClock = {
   /** Active time in levels so far. */
   activeMs: number
-  /** Active time at which the next nudge is due. */
-  nextAt: number
+  /** Active time when the count last started again (a break or NOT NOW). */
+  sinceMs: number
 }
 
 export function newNudgeClock(): NudgeClock {
-  return { activeMs: 0, nextAt: NUDGE_EVERY_MS }
+  return { activeMs: 0, sinceMs: 0 }
 }
 
 export function addActive(c: NudgeClock, ms: number): NudgeClock {
   return { ...c, activeMs: c.activeMs + ms }
 }
 
-export function nudgeDue(c: NudgeClock): boolean {
-  return c.activeMs >= c.nextAt
+/** Is a nudge due, with a reminder every `everyMinutes`? 0 means reminders are off. */
+export function nudgeDue(c: NudgeClock, everyMinutes: number): boolean {
+  if (everyMinutes <= 0) return false
+  return c.activeMs - c.sinceMs >= everyMinutes * MINUTE_MS
 }
 
-/** NOT NOW: ask again after another 20 minutes. */
+/** NOT NOW: ask again after another full interval. */
 export function snooze(c: NudgeClock): NudgeClock {
-  return { ...c, nextAt: c.activeMs + NUDGE_EVERY_MS }
+  return { ...c, sinceMs: c.activeMs }
 }
 
 /** The learner has been quiet long enough to show a nudge. */

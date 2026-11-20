@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react'
 
-import { useSetting } from '../arcade/settings'
+import { BREAK_CHOICES, NUDGE_CHOICES, useSetting } from '../arcade/settings'
 import { FeedbackLink } from './FeedbackLink'
 import styles from './SettingsMenu.module.css'
 
@@ -25,11 +25,51 @@ function Toggle({ label, on, onChange }: { label: string; on: boolean; onChange:
   )
 }
 
+/** A row of pixel buttons, one pressed: a small accessible choice group. */
+function Choice<T extends number>({
+  label,
+  choices,
+  value,
+  onChange,
+  text,
+  spoken,
+}: {
+  label: string
+  choices: readonly T[]
+  value: T
+  onChange: (value: T) => void
+  /** What the button shows, short so the row fits on a phone. */
+  text: (value: T) => string
+  /** What a screen reader says, for example "15 minutes". */
+  spoken: (value: T) => string
+}) {
+  return (
+    <fieldset className={styles.choice}>
+      <legend className={styles.choiceLabel}>{label}</legend>
+      <div className={styles.choiceRow}>
+        {choices.map((c) => (
+          <button
+            key={c}
+            type="button"
+            aria-pressed={c === value}
+            aria-label={spoken(c)}
+            className={`${styles.choiceBtn} ${c === value ? styles.on : ''}`}
+            onClick={() => onChange(c)}
+          >
+            {text(c)}
+          </button>
+        ))}
+      </div>
+    </fieldset>
+  )
+}
+
 /** The gear button in the header, opening a small settings panel. */
 export function SettingsMenu() {
   const [open, setOpen] = useState(false)
   const [sound, setSound] = useSetting('sound')
-  const [nudges, setNudges] = useSetting('nudges')
+  const [nudgeMinutes, setNudgeMinutes] = useSetting('nudgeMinutes')
+  const [breakMinutes, setBreakMinutes] = useSetting('breakMinutes')
   const panelId = useId()
   const wrapRef = useRef<HTMLDivElement>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -70,7 +110,28 @@ export function SettingsMenu() {
       {open ? (
         <div id={panelId} className={styles.panel} role="group" aria-label="Settings">
           <p className={styles.title}>SETTINGS</p>
-          <Toggle label="Break nudges" on={nudges} onChange={setNudges} />
+          <Choice
+            label="Break reminder every"
+            choices={NUDGE_CHOICES}
+            value={nudgeMinutes}
+            onChange={setNudgeMinutes}
+            text={(m) => (m === 0 ? 'OFF' : String(m))}
+            spoken={(m) => (m === 0 ? 'Off' : `${m} minutes`)}
+          />
+          <p className={styles.unit} aria-hidden="true">
+            {nudgeMinutes === 0 ? 'No reminders' : `Every ${nudgeMinutes} minutes in levels`}
+          </p>
+          <Choice
+            label="Break length"
+            choices={BREAK_CHOICES}
+            value={breakMinutes}
+            onChange={setBreakMinutes}
+            text={(m) => String(m)}
+            spoken={(m) => `${m} minutes`}
+          />
+          <p className={styles.unit} aria-hidden="true">
+            {breakMinutes} minutes
+          </p>
           <Toggle label="Sound" on={sound} onChange={setSound} />
           <FeedbackLink className={styles.feedback} />
         </div>
