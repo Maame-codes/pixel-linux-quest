@@ -178,3 +178,21 @@ Work one phase at a time. At the end of each phase: run tests and the build, sum
 - Every technical fact in a lesson must be correct for a real Linux system. If unsure, say so in your summary so I can check it.
 - Keep components small and typed. No `any`.
 - Do not add dependencies without saying why.
+
+## How we work
+
+The maintainer (Maame) reviews and merges. Claude does the GitHub work with `gh`.
+
+- **Never commit to main directly.** Start each piece of work from an up-to-date main (`git fetch` and branch from `origin/main`), on a branch named after its issue: `feature/12-flexible-timer`, `fix/15-tab-bug`, or `docs/` or `content/` where that fits better.
+- **One issue per pull request**, unless the maintainer asks to group them.
+- **Before pushing the branch**, run `npm run test` and `npm run build`, and fix anything that fails.
+- **Open the pull request with `gh pr create`**, with:
+  - a clear title
+  - what changed and why
+  - screenshots for visual changes
+  - how to test it (what to click and type)
+  - `Closes #N` for the issue
+- **Wait for CI and the Vercel preview**, then give the maintainer the pull request link and the preview link. **Never merge**: the maintainer reviews and merges.
+- **Commits** are made under the maintainer's GitHub account (the local git user, pushed through `gh`), ending with the `Co-Authored-By` line.
+- **Issues** use the labels feature, bug, content, feedback (ideas from players), learning, accessibility, devops, accounts, good first issue and help wanted, and a milestone ("Next update", "Update after that", "Accounts (December 2026)", one per world, "Later"). When an idea comes from a player, credit them by name in the issue, but never with an `@` in front (GitHub would notify whoever owns that username).
+- **main is protected** by the "Protect main" ruleset: changes go in through a pull request (0 approvals needed, as the maintainer cannot approve their own pull requests), the CI check `test-and-build` must pass, and force pushes and deleting the branch are blocked.
